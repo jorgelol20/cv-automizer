@@ -1,0 +1,261 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "name",
+    "title",
+    "about",
+    "skills",
+    "experience",
+    "projects",
+    "education",
+    "languages",
+    "contact"
+  ],
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Nombre completo del candidato basado exclusivamente en USER_INFO. No inventar."
+    },
+    "title": {
+      "type": "string",
+      "description": "Título profesional del candidato adaptado a la oferta y basado exclusivamente en información explícita de USER_INFO. No introducir competencias o tecnologías que no aparezcan en USER_INFO."
+    },
+    "about": {
+      "type": "string",
+      "description": "Resumen profesional adaptado a la oferta utilizando únicamente información explícita de USER_INFO. Puede reorganizar y reformular información existente, pero no puede introducir tecnologías, experiencia, conocimientos, responsabilidades o competencias que no aparezcan en USER_INFO."
+    },
+    "skills": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "languages",
+        "frameworks",
+        "databases",
+        "technologies"
+      ],
+      "properties": {
+        "languages": {
+          "type": "array",
+          "description": "Lenguajes de programación, scripting, consulta o similares que aparecen explícitamente en USER_INFO y sean relevantes para la oferta. No añadir lenguajes que solo aparezcan en la oferta.",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Lenguaje de programación, scripting o consulta explícitamente presente en USER_INFO."
+          }
+        },
+        "frameworks": {
+          "type": "array",
+          "description": "Frameworks y librerías que aparecen explícitamente en USER_INFO y sean relevantes para la oferta. No añadir frameworks que solo aparezcan en la oferta.",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "databases": {
+          "type": "array",
+          "description": "Exclusivamente bases de datos o servicios de base de datos/almacenamiento explícitamente identificados en USER_INFO. No utilizar categorías generales como 'AWS' si USER_INFO solo menciona servicios concretos como AWS RDS, AWS S3 o AWS DynamoDB.",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "technologies": {
+          "type": "array",
+          "description": "Tecnologías y herramientas que aparecen explícitamente en USER_INFO y sean relevantes para la oferta. No añadir tecnologías o herramientas que solo aparezcan en la oferta.",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "experience": {
+      "type": "array",
+      "description": "Experiencia profesional explícitamente presente en USER_INFO. Puede seleccionarse, reorganizarse y reformularse para adaptarse a la oferta, pero nunca inventarse.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "position",
+          "company",
+          "location",
+          "startDate",
+          "endDate",
+          "description"
+        ],
+        "properties": {
+          "position": {
+            "type": "string",
+            "description": "Puesto profesional tal como aparece en USER_INFO o reformulado sin cambiar su significado. No inventar."
+          },
+          "company": {
+            "type": "string",
+            "description": "Empresa explícitamente presente en USER_INFO. No inventar."
+          },
+          "location": {
+            "type": "string",
+            "description": "Ubicación explícitamente presente en USER_INFO. Si no aparece, utilizar cadena vacía."
+          },
+          "startDate": {
+            "type": "string",
+            "description": "Fecha de inicio exactamente como aparezca en USER_INFO. Si USER_INFO no proporciona una fecha de inicio explícita, utilizar cadena vacía. Nunca inferir ni calcular una fecha.",
+            "minLength": 0
+          },
+          "endDate": {
+            "type": "string",
+            "description": "Fecha de finalización exactamente como aparezca en USER_INFO. Si USER_INFO no proporciona una fecha de finalización explícita, utilizar cadena vacía. Nunca inferir ni calcular una fecha.",
+            "minLength": 0
+          },
+          "description": {
+            "type": "array",
+            "description": "Responsabilidades, tareas y logros reformulados a partir de información explícita de USER_INFO. Puede resumir, reorganizar y adaptar la redacción a la oferta, pero no puede añadir responsabilidades, tecnologías o conocimientos que no aparezcan en USER_INFO.",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        }
+      }
+    },
+    "projects": {
+      "type": "array",
+      "description": "Proyectos explícitamente presentes en USER_INFO. Puede seleccionarse, reorganizarse y reformularse para adaptarse a la oferta, pero nunca inventarse.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "name",
+          "url",
+          "description"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Nombre del proyecto explícitamente presente en USER_INFO. No inventar."
+          },
+          "url": {
+            "type": "string",
+            "description": "URL explícitamente proporcionada para el proyecto. Si no existe, utilizar cadena vacía."
+          },
+          "description": {
+            "type": "array",
+            "description": "Descripción basada exclusivamente en información existente en USER_INFO. Puede resumir, reorganizar y adaptar la redacción a la oferta, pero no introducir tecnologías, responsabilidades o conocimientos nuevos.",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        }
+      }
+    },
+    "education": {
+      "type": "array",
+      "description": "Estudios y formación explícitamente presentes en USER_INFO. Puede seleccionarse y reorganizarse según su relevancia para la oferta.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "title",
+          "startDate",
+          "endDate",
+          "institution",
+          "description"
+        ],
+        "properties": {
+          "title": {
+            "type": "string",
+            "description": "Título o formación explícitamente presente en USER_INFO. No inventar."
+          },
+          "startDate": {
+            "type": "string",
+            "description": "Fecha de inicio exactamente como aparezca en USER_INFO. Si USER_INFO no proporciona una fecha de inicio explícita, utilizar cadena vacía. Nunca inferir ni calcular una fecha.",
+            "minLength": 0
+          },
+          "endDate": {
+            "type": "string",
+            "description": "Fecha de finalización exactamente como aparezca en USER_INFO. Si USER_INFO no proporciona una fecha de finalización explícita, utilizar cadena vacía. Nunca inferir ni calcular una fecha.",
+            "minLength": 0
+          },
+          "institution": {
+            "type": "string",
+            "description": "Institución educativa explícitamente presente en USER_INFO. No inventar."
+          },
+          "description": {
+            "type": "array",
+            "description": "Información educativa basada exclusivamente en datos de USER_INFO. Puede resumirse y reorganizarse, pero no inventarse.",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        }
+      }
+    },
+    "languages": {
+      "type": "array",
+      "description": "EXCLUSIVAMENTE idiomas humanos. Nunca contiene lenguajes de programación, scripting o consulta. Solo incluir idiomas humanos explícitamente mencionados en USER_INFO y para los que exista evidencia explícita de nivel. Si no existe dicha información, debe ser un array vacío.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "name",
+          "level"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Nombre de un idioma HUMANO explícitamente presente en USER_INFO. Nunca puede ser un lenguaje de programación, scripting o consulta."
+          },
+          "level": {
+            "type": "string",
+            "description": "Nivel CEFR explícitamente proporcionado en USER_INFO para el idioma humano.",
+            "enum": [
+              "A1",
+              "A2",
+              "B1",
+              "B2",
+              "C1",
+              "C2"
+            ]
+          }
+        }
+      }
+    },
+    "contact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "email",
+        "phone",
+        "location",
+        "linkedin",
+        "github"
+      ],
+      "properties": {
+        "email": {
+          "type": "string",
+          "description": "Email explícitamente proporcionado por USER_INFO. Si no existe, cadena vacía."
+        },
+        "phone": {
+          "type": "string",
+          "description": "Teléfono explícitamente proporcionado por USER_INFO. Si no existe, cadena vacía."
+        },
+        "location": {
+          "type": "string",
+          "description": "Ubicación explícitamente proporcionada por USER_INFO. Si no existe, cadena vacía."
+        },
+        "linkedin": {
+          "type": "string",
+          "description": "Perfil de LinkedIn explícitamente proporcionado por USER_INFO. Si no existe, cadena vacía."
+        },
+        "github": {
+          "type": "string",
+          "description": "Perfil de GitHub explícitamente proporcionado por USER_INFO. Si no existe, cadena vacía."
+        }
+      }
+    }
+  }
+}

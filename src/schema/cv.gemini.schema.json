@@ -1,0 +1,240 @@
+{
+  "type": "object",
+  "required": [
+    "name",
+    "title",
+    "about",
+    "skills",
+    "experience",
+    "projects",
+    "education",
+    "languages",
+    "contact"
+  ],
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Nombre completo del candidato."
+    },
+    "title": {
+      "type": "string",
+      "description": "Título profesional del candidato."
+    },
+    "about": {
+      "type": "string",
+      "description": "Resumen profesional adaptado a la oferta utilizando únicamente información del candidato."
+    },
+    "skills": {
+      "type": "object",
+      "required": [
+        "languages",
+        "frameworks",
+        "databases",
+        "technologies"
+      ],
+      "properties": {
+        "languages": {
+          "type": "array",
+          "description": "Lenguajes de programación, scripting o consulta presentes en el candidato.",
+          "items": {
+            "type": "string"
+          }
+        },
+        "frameworks": {
+          "type": "array",
+          "description": "Frameworks y librerías presentes en el candidato.",
+          "items": {
+            "type": "string"
+          }
+        },
+        "databases": {
+          "type": "array",
+          "description": "Bases de datos y servicios de bases de datos o almacenamiento presentes en el candidato.",
+          "items": {
+            "type": "string"
+          }
+        },
+        "technologies": {
+          "type": "array",
+          "description": "Otras tecnologías, herramientas, plataformas o servicios presentes en el candidato.",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "experience": {
+      "type": "array",
+      "description": "Experiencia profesional del candidato.",
+      "items": {
+        "type": "object",
+        "required": [
+          "position",
+          "company",
+          "location",
+          "startDate",
+          "endDate",
+          "description"
+        ],
+        "properties": {
+          "position": {
+            "type": "string",
+            "description": "Puesto profesional."
+          },
+          "company": {
+            "type": "string",
+            "description": "Empresa."
+          },
+          "location": {
+            "type": "string",
+            "description": "Ubicación de la experiencia."
+          },
+          "startDate": {
+            "type": "string",
+            "description": "Fecha de inicio. Cadena vacía si no está disponible."
+          },
+          "endDate": {
+            "type": "string",
+            "description": "Fecha de finalización. Cadena vacía si no está disponible."
+          },
+          "description": {
+            "type": "array",
+            "description": "Responsabilidades, tareas y logros del puesto.",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "projects": {
+      "type": "array",
+      "description": "Proyectos del candidato.",
+      "items": {
+        "type": "object",
+        "required": [
+          "name",
+          "url",
+          "description"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Nombre del proyecto."
+          },
+          "url": {
+            "type": "string",
+            "description": "URL del proyecto. Cadena vacía si no existe."
+          },
+          "description": {
+            "type": "array",
+            "description": "Descripción del proyecto.",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "education": {
+      "type": "array",
+      "description": "Formación académica del candidato.",
+      "items": {
+        "type": "object",
+        "required": [
+          "title",
+          "startDate",
+          "endDate",
+          "institution",
+          "description"
+        ],
+        "properties": {
+          "title": {
+            "type": "string",
+            "description": "Título o formación."
+          },
+          "startDate": {
+            "type": "string",
+            "description": "Fecha de inicio. Cadena vacía si no está disponible."
+          },
+          "endDate": {
+            "type": "string",
+            "description": "Fecha de finalización. Cadena vacía si no está disponible."
+          },
+          "institution": {
+            "type": "string",
+            "description": "Institución educativa."
+          },
+          "description": {
+            "type": "array",
+            "description": "Información relevante de la formación.",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "languages": {
+      "type": "array",
+      "description": "Idiomas humanos del candidato. Nunca incluir lenguajes de programación.",
+      "items": {
+        "type": "object",
+        "required": [
+          "name",
+          "level"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Idioma humano."
+          },
+          "level": {
+            "type": "string",
+            "description": "Nivel CEFR del idioma.",
+            "enum": [
+              "A1",
+              "A2",
+              "B1",
+              "B2",
+              "C1",
+              "C2"
+            ]
+          }
+        }
+      }
+    },
+    "contact": {
+      "type": "object",
+      "required": [
+        "email",
+        "phone",
+        "location",
+        "linkedin",
+        "github"
+      ],
+      "properties": {
+        "email": {
+          "type": "string",
+          "description": "Email del candidato."
+        },
+        "phone": {
+          "type": "string",
+          "description": "Teléfono del candidato."
+        },
+        "location": {
+          "type": "string",
+          "description": "Ubicación del candidato."
+        },
+        "linkedin": {
+          "type": "string",
+          "description": "URL de LinkedIn."
+        },
+        "github": {
+          "type": "string",
+          "description": "URL de GitHub."
+        }
+      }
+    }
+  }
+}

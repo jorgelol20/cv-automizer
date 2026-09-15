@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <meta
+        http-equiv="Content-Security-Policy"
+        content="
+            default-src 'self';
+            script-src 'self';
+            style-src 'self' 'unsafe-inline';
+            img-src 'self' data:;
+        "
+    >
+
+    <title>CV Automizer</title>
+
+    <link
+        rel="stylesheet"
+        href="./style.css"
+    >
+</head>
+
+<body>
+
+    <main class="app">
+
+        <header class="app-header">
+            <div>
+                <h1>CV Automizer</h1>
+
+                <p>
+                    Editor y generador de CV
+                </p>
+            </div>
+        </header>
+
+        <section class="editor-card">
+
+            <div class="tabs">
+
+                <button
+                    type="button"
+                    class="tab active"
+                    data-tab="userInfo"
+                >
+                    Perfil
+                </button>
+
+                <button
+                    type="button"
+                    class="tab"
+                    data-tab="jobOffer"
+                >
+                    Oferta
+                </button>
+
+            </div>
+
+            <div class="editor-header">
+
+                <div>
+                    <h2 id="editor-title">
+                        Información del candidato
+                    </h2>
+
+                    <p id="editor-description">
+                        UserInfo.md
+                    </p>
+                </div>
+
+                <button
+                    id="save"
+                    type="button"
+                    class="secondary"
+                >
+                    Guardar cambios
+                </button>
+
+            </div>
+
+            <textarea
+                id="editor"
+                spellcheck="false"
+            ></textarea>
+
+        </section>
+
+        <section class="settings-card">
+
+            <div class="field">
+
+                <label for="provider">
+                    Proveedor de IA
+                </label>
+
+                <select id="provider">
+
+                    <option value="ollama">
+                        Ollama
+                    </option>
+
+                    <option value="gemini">
+                        Google Gemini
+                    </option>
+
+                </select>
+
+            </div>
+
+            <div class="field">
+
+                <label for="model">
+                    Modelo
+                </label>
+
+                <select id="model">
+
+                    <option value="">
+                        Selecciona un modelo...
+                    </option>
+
+                </select>
+
+            </div>
+
+        </section>
+
+        <section class="actions">
+
+            <button
+                id="generate"
+                type="button"
+                class="primary"
+            >
+                Generar CV
+            </button>
+
+        </section>
+
+        <section class="status-card">
+
+            <h2>Estado</h2>
+
+            <div id="status">
+                Cargando información...
+            </div>
+
+        </section>
+
+        <section
+            id="preview-card"
+            class="preview-card hidden"
+        >
+
+            <div class="preview-header">
+
+                <div>
+                    <h2>
+                        Previsualización
+                    </h2>
+
+                    <p>
+                        Vista del CV generado
+                    </p>
+                </div>
+
+                <div class="preview-actions">
+
+                    <button
+                        id="open-html"
+                        type="button"
+                        class="secondary"
+                    >
+                        Abrir HTML
+                    </button>
+
+                    <button
+                        id="open-pdf"
+                        type="button"
+                        class="secondary"
+                    >
+                        Abrir PDF
+                    </button>
+
+                    <button
+                        id="open-folder"
+                        type="button"
+                        class="secondary"
+                    >
+                        Abrir carpeta
+                    </button>
+
+                </div>
+
+            </div>
+
+            <div class="preview-container">
+
+                <iframe
+                    id="preview"
+                    title="Previsualización del CV"
+                ></iframe>
+
+            </div>
+
+        </section>
+
+    </main>
+
+    <script src="./app.js"></script>
+
+</body>
+
+</html>
