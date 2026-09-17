@@ -27,6 +27,7 @@ export class GeminiProvider extends AIProvider {
         model,
         temperature = 0.6,
         maxTokens = 16384,
+        schema
     }) {
         const started = performance.now();
 
@@ -59,13 +60,15 @@ export class GeminiProvider extends AIProvider {
             temperature,
             maxOutputTokens: maxTokens,
             responseMimeType: "application/json",
-            responseJsonSchema: geminiSchema
+            responseJsonSchema:
+                schema ?? geminiSchema
         };
 
         try {
             const response =
                 await this.client.models.generateContent({
                     model,
+
                     contents: [
                         {
                             role: "user",
@@ -76,6 +79,7 @@ export class GeminiProvider extends AIProvider {
                             ]
                         }
                     ],
+
                     config
                 });
 
@@ -110,23 +114,31 @@ export class GeminiProvider extends AIProvider {
                 }
 
                 throw new Error(
-                    `Gemini no devolvió contenido de texto${finishReason
-                        ? ` (finishReason: ${finishReason})`
-                        : ""
+                    `Gemini no devolvió contenido de texto${
+                        finishReason
+                            ? ` (finishReason: ${finishReason})`
+                            : ""
                     }.`
                 );
             }
-            if (finishReason === "MAX_TOKENS") {
+
+            if (
+                finishReason === "MAX_TOKENS"
+            ) {
                 throw new Error(
                     `Gemini agotó maxOutputTokens (${maxTokens}). ` +
-                    `Aumenta el límite de salida. | outputChars=${responseText.length}`
+                    `Aumenta el límite de salida. ` +
+                    `| outputChars=${responseText.length}`
                 );
             }
 
             let parsed = null;
 
             try {
-                parsed = JSON.parse(responseText);
+                parsed =
+                    JSON.parse(
+                        responseText
+                    );
             } catch (error) {
                 throw new Error(
                     `Gemini devolvió JSON inválido: ${error.message}` +
@@ -135,39 +147,61 @@ export class GeminiProvider extends AIProvider {
                 );
             }
 
-            const latencyMs = Math.round(
-                performance.now() - started
-            );
+            const latencyMs =
+                Math.round(
+                    performance.now() -
+                    started
+                );
 
             const usage =
                 response.usageMetadata;
 
             return {
                 responseText,
+
                 parsed,
+
                 tokensInput:
-                    usage?.promptTokenCount ?? null,
+                    usage?.promptTokenCount ??
+                    null,
+
                 tokensOutput:
-                    usage?.candidatesTokenCount ?? null,
+                    usage?.candidatesTokenCount ??
+                    null,
+
                 latencyMs,
+
                 rawMetadata: {
                     totalTokenCount:
-                        usage?.totalTokenCount ?? null,
+                        usage?.totalTokenCount ??
+                        null,
+
                     finishReason,
+
                     modelVersion:
-                        response.modelVersion ?? null,
+                        response.modelVersion ??
+                        null,
+
                     responseId:
-                        response.responseId ?? null
+                        response.responseId ??
+                        null
                 }
             };
         } catch (error) {
             const message =
-                String(error.message || error);
+                String(
+                    error.message ||
+                    error
+                );
 
             if (
                 message.includes("429") ||
-                message.includes("RESOURCE_EXHAUSTED") ||
-                message.toLowerCase().includes("quota")
+                message.includes(
+                    "RESOURCE_EXHAUSTED"
+                ) ||
+                message
+                    .toLowerCase()
+                    .includes("quota")
             ) {
                 throw new Error(
                     `Gemini: cuota o límite de uso excedido. ${message}`
@@ -176,7 +210,9 @@ export class GeminiProvider extends AIProvider {
 
             if (
                 message.includes("404") ||
-                message.toLowerCase().includes("not found")
+                message
+                    .toLowerCase()
+                    .includes("not found")
             ) {
                 throw new Error(
                     `Gemini: modelo no encontrado o no disponible. ${message}`
@@ -198,25 +234,31 @@ export class GeminiProvider extends AIProvider {
     }
 }
 
-export async function listGeminiModels(apiKey) {
+export async function listGeminiModels(
+    apiKey
+) {
     if (!apiKey) {
         throw new Error(
             "GEMINI_API_KEY no está configurada."
         );
     }
 
-    const client = new GoogleGenAI({
-        apiKey
-    });
+    const client =
+        new GoogleGenAI({
+            apiKey
+        });
 
     const pager =
         await client.models.list();
 
     const models = [];
 
-    for await (const model of pager) {
+    for await (
+        const model of pager
+    ) {
         const supportedActions =
-            model.supportedActions ?? [];
+            model.supportedActions ??
+            [];
 
         if (
             !supportedActions.includes(
@@ -231,7 +273,7 @@ export async function listGeminiModels(apiKey) {
             model.name?.replace(
                 /^models\//,
                 ""
-            );;
+            );
 
         if (!id) {
             continue;
@@ -239,10 +281,15 @@ export async function listGeminiModels(apiKey) {
 
         models.push({
             id,
+
             name:
-                model.displayName || id,
+                model.displayName ||
+                id,
+
             provider: "gemini",
-            supportsStructuredOutput: true
+
+            supportsStructuredOutput:
+                true
         });
     }
 

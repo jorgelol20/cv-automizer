@@ -68,6 +68,31 @@ const tabs =
     ".tab"
   );
 
+const matchResult =
+  document.getElementById(
+    "match-result"
+  );
+
+const matchScoreValue =
+  document.getElementById(
+    "match-score-value"
+  );
+
+const matchSummary =
+  document.getElementById(
+    "match-summary"
+  );
+
+const matchStrengths =
+  document.getElementById(
+    "match-strengths"
+  );
+
+const matchGaps =
+  document.getElementById(
+    "match-gaps"
+  );
+
 let files = {
   userInfo: "",
   jobOffer: ""
@@ -188,6 +213,85 @@ async function saveAllFiles() {
   dirty = false;
 }
 
+function clearMatch() {
+  if (!matchResult) {
+    return;
+  }
+
+  matchScoreValue.textContent =
+    "–";
+
+  matchSummary.textContent =
+    "";
+
+  matchStrengths.innerHTML =
+    "";
+
+  matchGaps.innerHTML =
+    "";
+
+  matchResult.classList.add(
+    "hidden"
+  );
+}
+
+function showMatch(match) {
+  if (!match) {
+    clearMatch();
+    return;
+  }
+
+  matchScoreValue.textContent =
+    match.score ?? "–";
+
+  matchSummary.textContent =
+    match.summary ?? "";
+
+  matchStrengths.innerHTML =
+    "";
+
+  for (
+    const strength of
+      match.strengths ?? []
+  ) {
+    const li =
+      document.createElement(
+        "li"
+      );
+
+    li.textContent =
+      strength;
+
+    matchStrengths.appendChild(
+      li
+    );
+  }
+
+  matchGaps.innerHTML =
+    "";
+
+  for (
+    const gap of
+      match.gaps ?? []
+  ) {
+    const li =
+      document.createElement(
+        "li"
+      );
+
+    li.textContent =
+      gap;
+
+    matchGaps.appendChild(
+      li
+    );
+  }
+
+  matchResult.classList.remove(
+    "hidden"
+  );
+}
+
 function loadPreview(html) {
   if (
     typeof html !== "string" ||
@@ -210,14 +314,16 @@ async function loadModels() {
   const provider =
     providerSelect.value;
 
-  modelSelect.innerHTML = "";
+  modelSelect.innerHTML =
+    "";
 
   const loadingOption =
     document.createElement(
       "option"
     );
 
-  loadingOption.value = "";
+  loadingOption.value =
+    "";
 
   loadingOption.textContent =
     "Cargando modelos...";
@@ -234,7 +340,8 @@ async function loadModels() {
           provider
         );
 
-    modelSelect.innerHTML = "";
+    modelSelect.innerHTML =
+      "";
 
     if (
       models.length === 0
@@ -244,7 +351,8 @@ async function loadModels() {
           "option"
         );
 
-      option.value = "";
+      option.value =
+        "";
 
       option.textContent =
         "No hay modelos disponibles";
@@ -275,14 +383,16 @@ async function loadModels() {
       );
     }
   } catch (error) {
-    modelSelect.innerHTML = "";
+    modelSelect.innerHTML =
+      "";
 
     const option =
       document.createElement(
         "option"
       );
 
-    option.value = "";
+    option.value =
+      "";
 
     option.textContent =
       "Error obteniendo modelos";
@@ -337,7 +447,12 @@ saveButton.addEventListener(
 
 providerSelect.addEventListener(
   "change",
-  loadModels
+  async () => {
+    currentOutput = null;
+    clearMatch();
+
+    await loadModels();
+  }
 );
 
 generateButton.addEventListener(
@@ -372,6 +487,10 @@ generateButton.addEventListener(
       modelSelect.disabled =
         true;
 
+      currentOutput = null;
+
+      clearMatch();
+
       setStatus(
         "🤖 Generando CV..."
       );
@@ -384,27 +503,66 @@ generateButton.addEventListener(
             model
           });
 
-      currentOutput =
-        result.output;
+      if (!result) {
+        throw new Error(
+          "No se recibió ningún resultado de la generación."
+        );
+      }
 
-      loadPreview(
-        result.html
+      currentOutput =
+        result.output ?? null;
+
+      if (result.html) {
+        loadPreview(
+          result.html
+        );
+      }
+
+      showMatch(
+        result.match
       );
 
       const output =
-        result.output;
+        result.output ?? {};
 
       const metrics =
         result.metrics;
 
       const statusLines = [
-        "✅ CV generado correctamente.",
-        "",
-        `JSON: ${output.json}`,
-        `Markdown: ${output.markdown}`,
-        `HTML: ${output.html}`,
-        `PDF: ${output.pdf}`
+        "✅ CV generado correctamente."
       ];
+
+      if (output.json) {
+        statusLines.push(
+          "",
+          `JSON: ${output.json}`
+        );
+      }
+
+      if (output.markdown) {
+        statusLines.push(
+          `Markdown: ${output.markdown}`
+        );
+      }
+
+      if (output.html) {
+        statusLines.push(
+          `HTML: ${output.html}`
+        );
+      }
+
+      if (output.pdf) {
+        statusLines.push(
+          `PDF: ${output.pdf}`
+        );
+      }
+
+      if (result.match) {
+        statusLines.push(
+          "",
+          `🎯 Match: ${result.match.score}/100`
+        );
+      }
 
       if (metrics) {
         statusLines.push(
@@ -438,10 +596,14 @@ generateButton.addEventListener(
       }
 
       setStatus(
-        statusLines.join("\n")
+        statusLines.join(
+          "\n"
+        )
       );
 
     } catch (error) {
+      clearMatch();
+
       setStatus(
         `❌ ${error.message}`
       );
@@ -464,7 +626,9 @@ generateButton.addEventListener(
 openHtmlButton.addEventListener(
   "click",
   async () => {
-    if (!currentOutput?.html) {
+    if (
+      !currentOutput?.html
+    ) {
       setStatus(
         "❌ No hay un HTML generado."
       );
@@ -489,7 +653,9 @@ openHtmlButton.addEventListener(
 openPdfButton.addEventListener(
   "click",
   async () => {
-    if (!currentOutput?.pdf) {
+    if (
+      !currentOutput?.pdf
+    ) {
       setStatus(
         "❌ No hay un PDF generado."
       );
@@ -526,5 +692,6 @@ openFolderButton.addEventListener(
   }
 );
 
+clearMatch();
 loadFiles();
 loadModels();

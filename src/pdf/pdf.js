@@ -1,8 +1,8 @@
 import { chromium } from "playwright";
-
+import 'dotenv/config'
 export async function generatePdf(html, outputPath) {
     const browser = await chromium.launch({
-        executablePath: "C:\\Users\\jorge\\Downloads\\chrome-win64\\chrome.exe"
+        executablePath: process.env.CHROME_ROUTE
     });
 
     try {

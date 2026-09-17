@@ -24,6 +24,14 @@ import schema from "./schema/cv.schema.json" with {
     type: "json"
 };
 
+import {
+    buildMatchPrompt
+} from "./ai/match.js";
+
+import matchSchema from "./schema/cv.match.schema.json" with {
+    type: "json"
+};
+
 export async function generateCV({
     provider: providerId,
     model
@@ -71,10 +79,44 @@ export async function generateCV({
     cv.name = source.name;
     cv.contact = source.contact;
 
+    const matchPrompt =
+        buildMatchPrompt({
+            cv,
+            jobOffer
+        });
+
+    console.log();
+    console.log(
+        "📊 Evaluando match con la oferta..."
+    );
+
+    const matchResult =
+        await provider.generate({
+            systemPrompt: matchPrompt.system,
+            userPrompt: matchPrompt.prompt,
+            model,
+            temperature: 0.1,
+            maxTokens: 2048,
+            schema: matchSchema
+        });
+
+    if (!matchResult.parsed) {
+        throw new Error(
+            "El evaluador no devolvió un resultado JSON."
+        );
+    }
+
+    const match = matchResult.parsed;
+
+    console.log(
+        `🎯 Match: ${match.score}/100`
+    );
+
     enforceTraceability(
         cv,
         userInfo
     );
+
 
     if (process.env.NOMBRE_USUARIO?.trim()) {
         cv.name =
@@ -126,6 +168,8 @@ export async function generateCV({
         cv,
 
         html,
+
+        match,
 
         output: {
             json: `output/CV-${fileName}.json`,
