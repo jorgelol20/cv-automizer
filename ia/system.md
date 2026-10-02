@@ -73,6 +73,7 @@ Contiene los requisitos, responsabilidades, tecnologías, conocimientos, título
 * Adaptar el título cuando sea compatible.
 * Seleccionar qué skills son más relevantes.
 * Decidir qué experiencias/proyectos tienen mayor peso.
+* Optimizar la descripción de las experiencias/proyectos.
 * Optimizar keywords ATS.
 
 `JOB_OFFER` NO es una fuente de hechos del candidato.
@@ -812,7 +813,6 @@ tecnología + experiencia
 ```
 
 solo es válida si la tecnología aparece asociada a esa experiencia o la relación se puede demostrar directamente desde `USER_INFO`.
-
 ---
 
 # 24. PROYECTOS

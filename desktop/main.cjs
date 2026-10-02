@@ -144,6 +144,21 @@ ipcMain.handle(
   ) => {
     try {
       if (
+        provider === "opencode-zen"
+      ) {
+        const {
+          listOpencodeModels
+        } = await import(
+          "../src/ai/opencode.js"
+        );
+
+        return await listOpencodeModels(
+          process.env.OPENCODE_ZEN_API_KEY ||
+          process.env.OPENCODE_API_KEY
+        );
+      }
+
+      if (
         provider === "ollama"
       ) {
         const {
@@ -173,10 +188,49 @@ ipcMain.handle(
         `Proveedor desconocido: ${provider}`
       );
     } catch (error) {
-      throw new Error(
-        error.message ||
-        String(error)
-      );
+      const errorMessage = error.message || String(error);
+
+      // Mensajes más descriptivos según el proveedor
+      if (provider === "ollama") {
+        if (errorMessage.includes("ECONNREFUSED") || errorMessage.includes("fetch failed")) {
+          throw new Error(
+            "No se pudo conectar con Ollama. Asegúrate de que el servidor esté corriendo en http://localhost:11434"
+          );
+        }
+        if (errorMessage.includes("503") || errorMessage.includes("UNAVAILABLE")) {
+          throw new Error(
+            "Ollama no está disponible. Inicia el servidor con: ollama serve"
+          );
+        }
+      }
+
+      if (provider === "gemini") {
+        if (errorMessage.includes("503") || errorMessage.includes("UNAVAILABLE")) {
+          throw new Error(
+            "El servicio de Google Gemini no está disponible temporalmente. Reintenta en unos minutos."
+          );
+        }
+        if (errorMessage.includes("401") || errorMessage.includes("403")) {
+          throw new Error(
+            "API key de Gemini inválida o sin permisos. Verifica GEMINI_API_KEY en tu archivo .env"
+          );
+        }
+      }
+
+      if (provider === "opencode-zen") {
+        if (errorMessage.includes("401") || errorMessage.includes("403")) {
+          throw new Error(
+            "API key de OpenCode Zen inválida o sin permisos. Verifica OPENCODE_ZEN_API_KEY en tu archivo .env"
+          );
+        }
+        if (errorMessage.includes("429")) {
+          throw new Error(
+            "Cuota de OpenCode Zen excedida. Reintenta más tarde."
+          );
+        }
+      }
+
+      throw new Error(errorMessage);
     }
   }
 );
@@ -290,6 +344,31 @@ ipcMain.handle(
     } catch (error) {
       throw new Error(
         `No se pudo abrir la carpeta de salida: ${error.message}`
+      );
+    }
+  }
+);
+
+ipcMain.handle(
+  "generate-general-kit",
+  async (
+    _event,
+    options
+  ) => {
+    try {
+      const {
+        generateGeneralKit
+      } = await import(
+        "../src/general/generate.js"
+      );
+
+      return await generateGeneralKit(
+        options
+      );
+    } catch (error) {
+      throw new Error(
+        error.message ||
+        String(error)
       );
     }
   }

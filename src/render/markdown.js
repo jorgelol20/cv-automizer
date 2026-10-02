@@ -111,6 +111,30 @@ export function renderMarkdown(cv) {
     }
   }
 
+  if (cv.certificates.length > 0) {
+    lines.push("## Certificaciones");
+    lines.push("");
+
+    for (const certificate of cv.education) {
+      lines.push(`### ${certificate.title}`);
+      lines.push(`*${certificate.institution}*`);
+
+      if (certificate.startDate || certificate.endDate) {
+        lines.push(
+          `${certificate.startDate} – ${certificate.endDate}`
+        );
+      }
+
+      lines.push("");
+
+      for (const description of certificate.description) {
+        lines.push(`- ${description}`);
+      }
+
+      lines.push("");
+    }
+  }
+
   if (cv.languages.length > 0) {
     lines.push("## Idiomas");
     lines.push("");

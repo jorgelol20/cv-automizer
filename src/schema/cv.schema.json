@@ -193,6 +193,48 @@
         }
       }
     },
+    "certificates": {
+      "type": "array",
+      "description": "Certificados explícitamente presentes en USER_INFO. Puede seleccionarse y reorganizarse según su relevancia para la oferta.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "title",
+          "issueDate",
+          "institution",
+          "description"
+        ],
+        "properties": {
+          "title": {
+            "type": "string",
+            "description": "Título o formación explícitamente presente en USER_INFO. No inventar."
+          },
+          "issueDate": {
+            "type": "string",
+            "description": "Fecha de expedición del certificado exactamente como aparezca en USER_INFO. Si USER_INFO no proporciona una fecha de inicio explícita, utilizar cadena vacía. Nunca inferir ni calcular una fecha.",
+            "minLength": 0
+          },
+          "endDate": {
+            "type": "string",
+            "description": "Fecha de caducidad de la certificación exactamente como aparezca en USER_INFO. Si USER_INFO no proporciona una fecha de finalización explícita, utilizar cadena vacía. Nunca inferir ni calcular una fecha.",
+            "minLength": 0
+          },
+          "institution": {
+            "type": "string",
+            "description": "Institución explícitamente presente en USER_INFO. No inventar."
+          },
+          "description": {
+            "type": "array",
+            "description": "Información basada exclusivamente en datos de USER_INFO. Puede resumirse y reorganizarse, pero no inventarse.",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        }
+      }
+    },
     "languages": {
       "type": "array",
       "description": "EXCLUSIVAMENTE idiomas humanos. Nunca contiene lenguajes de programación, scripting o consulta. Solo incluir idiomas humanos explícitamente mencionados en USER_INFO y para los que exista evidencia explícita de nivel. Si no existe dicha información, debe ser un array vacío.",
@@ -254,6 +296,10 @@
         "github": {
           "type": "string",
           "description": "Perfil de GitHub explícitamente proporcionado por USER_INFO. Si no existe, cadena vacía."
+        },
+        "portfolio": {
+          "type": "string",
+          "description": "Portfolio proporcionado por USER_INFO. Si no existe, cadena vacía."
         }
       }
     }

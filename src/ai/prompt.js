@@ -18,7 +18,8 @@ function renderPrompt(template, variables) {
 export async function buildPrompt({
   userInfo,
   jobOffer,
-  schema
+  schema,
+  layout = "standard"
 }) {
   const systemTemplate = await readFile(
     "ia/system.md",
@@ -29,6 +30,11 @@ export async function buildPrompt({
     "ia/prompt.md",
     "utf-8"
   );
+
+  const layoutInstruction =
+    layout === "one-page"
+      ? `=== CUMPLIR FORMATO ONE-PAGE ===`
+      : `=== CUMPLIR FORMATO ESTÁNDAR ===`;
 
   if (!systemTemplate.trim()) {
     throw new Error(
@@ -43,13 +49,15 @@ export async function buildPrompt({
   }
 
   const variables = {
+    LAYOUT_INSTRUCTION: layoutInstruction,
     USER_INFO: userInfo,
     JOB_OFFER: jobOffer,
     CV_SCHEMA: JSON.stringify(
       schema,
       null,
       2
-    )
+    ),
+    
   };
 
   const system = renderPrompt(

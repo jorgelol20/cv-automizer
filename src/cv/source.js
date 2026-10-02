@@ -270,13 +270,37 @@ function parseEducation(lines) {
     }));
 }
 
+function parseCertificates(lines) {
+    const blocks =
+        parseMarkdownBlocks(lines);
+
+    return blocks.map((block) => ({
+        title: block.heading,
+        issueDate: getBlockValue(
+            block,
+            "Expedido"
+        ),
+        endDate: getBlockValue(
+            block,
+            "Caducidad"
+        ),
+        institution: getBlockValue(
+            block,
+            "Institución"
+        ),
+        description:
+            parseBulletLines(block.lines)
+    }));
+}
+
 function parseContact(lines) {
     const contact = {
         email: "",
         phone: "",
         location: "",
         linkedin: "",
-        github: ""
+        github: "",
+        portfolio: ""
     };
 
     const section =
@@ -326,6 +350,12 @@ function parseContact(lines) {
                 "GitHub"
             );
 
+        const portfolio =
+            getLabeledValue(
+                line,
+                "Portfolio"
+            );
+
         if (email) {
             contact.email =
                 email.replace(
@@ -348,6 +378,10 @@ function parseContact(lines) {
 
         if (github) {
             contact.github = github;
+        }
+
+        if (portfolio) {
+            contact.portfolio = portfolio;
         }
     }
 
@@ -427,6 +461,12 @@ export function parseUserInfo(userInfo) {
             lines,
             "Educación"
         );
+    
+    const certificatesSection =
+        findSectionBounds(
+            lines,
+            "Certificaciones"
+        );
 
     const experience =
         experienceSection
@@ -457,6 +497,16 @@ export function parseUserInfo(userInfo) {
                 )
             )
             : [];
+    
+    const certificates =
+        certificatesSection
+            ? parseCertificates(
+                lines.slice(
+                    certificatesSection.start,
+                    certificatesSection.end
+                )
+            )
+            : [];
 
     const contact =
         parseContact(lines);
@@ -468,6 +518,7 @@ export function parseUserInfo(userInfo) {
         experience,
         projects,
         education,
+        certificates,
         languages: [],
         contact
     };
@@ -489,6 +540,13 @@ export function parseUserInfo(userInfo) {
     source.education = source.education.map(
         (item, index) => ({
             id: `education-${index + 1}`,
+            ...item
+        })
+    );
+
+    source.certificates = source.certificates.map(
+        (item, index) => ({
+            id: `certificate-${index + 1}`,
             ...item
         })
     );

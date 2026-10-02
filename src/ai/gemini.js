@@ -6,6 +6,17 @@ import geminiSchema from "../schema/cv.gemini.schema.json" with {
     type: "json"
 };
 
+// Excepción intencional al punto 1 (mismo schema):
+// la API de Gemini no acepta `additionalProperties: false`,
+// `minLength` ni ciertas construcciones del draft 2020-12,
+// por eso existe cv.gemini.schema.json como versión
+// simplificada SOLO para `responseJsonSchema`.
+// El contrato canónico sigue siendo cv.schema.json,
+// que se inyecta en el prompt y se valida después
+// con AJV en src/app.js (validateCV).
+// Cuando el llamante pasa `schema`, este tiene
+// prioridad y geminiSchema solo es el fallback.
+
 export class GeminiProvider extends AIProvider {
     constructor({ apiKey }) {
         super();

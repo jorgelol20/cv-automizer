@@ -8,9 +8,14 @@ import {
 
 import { listGeminiModels } from "./ai/gemini.js";
 import { listOllamaModels } from "./ai/ollama.js";
+import { listOpencodeModels } from "./ai/opencode.js";
 import { generateCV } from "./app.js";
 
 const PROVIDERS = [
+  {
+    id: "opencode-zen",
+    name: "OpenCode Zen (gratis)"
+  },
   {
     id: "gemini",
     name: "Google Gemini"
@@ -23,6 +28,12 @@ const PROVIDERS = [
 
 async function listModels(provider) {
   switch (provider) {
+    case "opencode-zen":
+      return listOpencodeModels(
+        process.env.OPENCODE_ZEN_API_KEY ||
+        process.env.OPENCODE_API_KEY
+      );
+
     case "gemini":
       return listGeminiModels(
         process.env.GEMINI_API_KEY

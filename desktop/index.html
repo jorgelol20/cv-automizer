@@ -4,27 +4,18 @@
 <head>
     <meta charset="UTF-8">
 
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <meta
-        http-equiv="Content-Security-Policy"
-        content="
+    <meta http-equiv="Content-Security-Policy" content="
             default-src 'self';
             script-src 'self';
             style-src 'self' 'unsafe-inline';
             img-src 'self' data:;
-        "
-    >
+        ">
 
     <title>CV Automizer</title>
 
-    <link
-        rel="stylesheet"
-        href="./style.css"
-    >
+    <link rel="stylesheet" href="./style.css">
 </head>
 
 <body>
@@ -41,228 +32,256 @@
             </div>
         </header>
 
-        <section class="editor-card">
+        <div class="tabs">
+            <button type="button" class="tab active" data-tab="userInfo">
+                Perfil
+            </button>
 
-            <div class="tabs">
+            <button type="button" class="tab" data-tab="jobOffer">
+                Específica
+            </button>
 
-                <button
-                    type="button"
-                    class="tab active"
-                    data-tab="userInfo"
-                >
-                    Perfil
-                </button>
+            <button type="button" class="tab" data-tab="general">
+                General
+            </button>
+        </div>
 
-                <button
-                    type="button"
-                    class="tab"
-                    data-tab="jobOffer"
-                >
-                    Oferta
-                </button>
+        <!-- Pestaña Perfil: Solo editor de UserInfo.md -->
+        <section id="panel-userInfo" class="tab-panel">
+            <div class="editor-card">
+                <div class="editor-header">
+                    <div>
+                        <h2>Información del candidato</h2>
+                        <p>UserInfo.md</p>
+                    </div>
 
-            </div>
-
-            <div class="editor-header">
-
-                <div>
-                    <h2 id="editor-title">
-                        Información del candidato
-                    </h2>
-
-                    <p id="editor-description">
-                        UserInfo.md
-                    </p>
+                    <button id="save-userInfo" type="button" class="secondary">
+                        Guardar cambios
+                    </button>
                 </div>
 
-                <button
-                    id="save"
-                    type="button"
-                    class="secondary"
-                >
-                    Guardar cambios
-                </button>
-
+                <textarea id="editor-userInfo" spellcheck="false"></textarea>
             </div>
-
-            <textarea
-                id="editor"
-                spellcheck="false"
-            ></textarea>
-
         </section>
 
-        <section class="settings-card">
-
+        <!-- Selectores compartidos (Específica y General) -->
+        <section id="shared-settings" class="settings-card hidden">
             <div class="field">
-
                 <label for="provider">
                     Proveedor de IA
                 </label>
 
                 <select id="provider">
-
-                    <option value="ollama">
-                        Ollama
+                    <option value="opencode-zen">
+                        OpenCode Zen (Free tier)
                     </option>
 
                     <option value="gemini">
                         Google Gemini
                     </option>
 
+                    <option value="ollama">
+                        Ollama
+                    </option>
                 </select>
-
             </div>
 
             <div class="field">
-
                 <label for="model">
                     Modelo
                 </label>
 
                 <select id="model">
-
                     <option value="">
                         Selecciona un modelo...
                     </option>
-
                 </select>
-
             </div>
 
-        </section>
+            <div class="field">
+                <label for="layout">
+                    Formato del CV
+                </label>
 
-        <section class="actions">
+                <select id="layout">
+                    <option value="standard">
+                        Estándar
+                    </option>
 
-            <button
-                id="generate"
-                type="button"
-                class="primary"
-            >
-                Generar CV
-            </button>
-
-        </section>
-
-        <section class="status-card">
-
-            <h2>Estado</h2>
-
-            <div id="status">
-                Cargando información...
+                    <option value="one-page">
+                        One Page
+                    </option>
+                </select>
             </div>
-
         </section>
 
-        <section
-            id="match-result"
-            class="status-card match-result hidden"
-        >
+        <!-- Pestaña Específica: Editor de oferta + generar CV -->
+        <section id="panel-jobOffer" class="tab-panel hidden">
+            <div class="editor-card">
+                <div class="editor-header">
+                    <div>
+                        <h2>Oferta de empleo</h2>
+                        <p>oferta.md</p>
+                    </div>
 
-            <div class="match-header">
-
-                <div>
-                    <h2>
-                        Match con la oferta
-                    </h2>
-
-                    <p id="match-summary"></p>
-                </div>
-
-                <div class="match-score">
-                    <span id="match-score-value">
-                        –
-                    </span>
-
-                    <span>
-                        /100
-                    </span>
-                </div>
-
-            </div>
-
-            <div class="match-columns">
-
-                <div class="match-column">
-
-                    <strong>
-                        Fortalezas
-                    </strong>
-
-                    <ul id="match-strengths"></ul>
-
-                </div>
-
-                <div class="match-column">
-
-                    <strong>
-                        Carencias
-                    </strong>
-
-                    <ul id="match-gaps"></ul>
-
-                </div>
-
-            </div>
-
-        </section>
-
-        <section
-            id="preview-card"
-            class="preview-card hidden"
-        >
-
-            <div class="preview-header">
-
-                <div>
-                    <h2>
-                        Previsualización
-                    </h2>
-
-                    <p>
-                        Vista del CV generado
-                    </p>
-                </div>
-
-                <div class="preview-actions">
-
-                    <button
-                        id="open-html"
-                        type="button"
-                        class="secondary"
-                    >
-                        Abrir HTML
+                    <button id="save-jobOffer" type="button" class="secondary">
+                        Guardar cambios
                     </button>
-
-                    <button
-                        id="open-pdf"
-                        type="button"
-                        class="secondary"
-                    >
-                        Abrir PDF
-                    </button>
-
-                    <button
-                        id="open-folder"
-                        type="button"
-                        class="secondary"
-                    >
-                        Abrir carpeta
-                    </button>
-
                 </div>
 
+                <textarea id="editor-jobOffer" spellcheck="false" placeholder="Pega aquí el texto de la oferta de empleo..."></textarea>
             </div>
 
-            <div class="preview-container">
+            <section class="actions">
+                <button id="generate" type="button" class="primary">
+                    Generar CV
+                </button>
+            </section>
 
-                <iframe
-                    id="preview"
-                    title="Previsualización del CV"
-                ></iframe>
+            <section class="status-card">
+                <h2>Estado</h2>
+                <div id="status">
+                    Cargando información...
+                </div>
+            </section>
 
+            <section id="match-result" class="status-card match-result hidden">
+                <div class="match-header">
+                    <div>
+                        <h2>
+                            Match con la oferta
+                        </h2>
+
+                        <p id="match-summary"></p>
+                    </div>
+
+                    <div class="match-score">
+                        <span id="match-score-value">
+                            –
+                        </span>
+
+                        <span>
+                            /100
+                        </span>
+                    </div>
+                </div>
+
+                <div class="match-columns">
+                    <div class="match-column">
+                        <strong>
+                            Fortalezas
+                        </strong>
+
+                        <ul id="match-strengths"></ul>
+                    </div>
+
+                    <div class="match-column">
+                        <strong>
+                            Carencias
+                        </strong>
+
+                        <ul id="match-gaps"></ul>
+                    </div>
+                </div>
+            </section>
+
+            <section id="preview-card" class="preview-card hidden">
+                <div class="preview-header">
+                    <div>
+                        <h2>
+                            Previsualización
+                        </h2>
+
+                        <p>
+                            Vista del CV generado
+                        </p>
+                    </div>
+
+                    <div class="preview-actions">
+                        <button id="open-html" type="button" class="secondary">
+                            Abrir HTML
+                        </button>
+
+                        <button id="open-pdf" type="button" class="secondary">
+                            Abrir PDF
+                        </button>
+
+                        <button id="open-folder" type="button" class="secondary">
+                            Abrir carpeta
+                        </button>
+                    </div>
+                </div>
+
+                <div class="preview-container">
+                    <iframe id="preview" title="Previsualización del CV"></iframe>
+                </div>
+            </section>
+        </section>
+
+        <!-- Pestaña General: Formulario de empresa + generar kit -->
+        <section id="panel-general" class="tab-panel hidden">
+            <div class="general-panel">
+                <div class="general-form">
+                    <h2>Kit de Candidatura Espontánea</h2>
+                    <p>Genera un CV y una carta de presentación adaptados a la empresa que elijas.</p>
+
+                    <div class="field">
+                        <label for="company-name">Nombre de la empresa</label>
+                        <input type="text" id="company-name" placeholder="Ej.: TechCorp, Consultora XYZ..." />
+                    </div>
+
+                    <div class="field">
+                        <label for="company-type">Tipo de empresa</label>
+                        <select id="company-type">
+                            <option value="startup">Startup</option>
+                            <option value="consulting">Consultora</option>
+                            <option value="enterprise">Gran empresa</option>
+                            <option value="sector">Sector específico</option>
+                        </select>
+                    </div>
+
+                    <div class="field">
+                        <label for="tone">Tono de la carta</label>
+                        <select id="tone">
+                            <option value="formal">Formal</option>
+                            <option value="enthusiastic">Entusiasta</option>
+                            <option value="direct">Directo</option>
+                        </select>
+                    </div>
+
+                    <div class="field">
+                        <label for="letter-length">Longitud de la carta</label>
+                        <select id="letter-length">
+                            <option value="short">Corta (1 párrafo)</option>
+                            <option value="medium">Media (3 párrafos)</option>
+                            <option value="long">Larga (4-5 párrafos)</option>
+                        </select>
+                    </div>
+
+                    <button id="generate-general" type="button" class="primary">
+                        Generar Kit de Candidatura
+                    </button>
+                </div>
+
+                <div id="general-result" class="general-result hidden">
+                    <h3>Resultado</h3>
+                    <div id="general-status"></div>
+                    <div class="general-actions">
+                        <button id="open-cv-pdf" type="button" class="secondary">
+                            Abrir CV PDF
+                        </button>
+                        <button id="open-letter-pdf" type="button" class="secondary">
+                            Abrir Carta PDF
+                        </button>
+                        <button id="open-email-pdf" type="button" class="secondary">
+                            Abrir Email PDF
+                        </button>
+                        <button id="open-general-folder" type="button" class="secondary">
+                            Abrir carpeta
+                        </button>
+                    </div>
+                </div>
             </div>
-
         </section>
 
     </main>

@@ -1,33 +1,44 @@
 import { mkdir, writeFile } from "node:fs/promises";
-const userName = process.env.NOMBRE_USUARIO.replaceAll(' ', '');
 
-export async function saveCV(cv) {
+import { getUserFilePart } from "./naming.js";
+
+function defaultName() {
+  return `CV-${getUserFilePart()}`;
+}
+
+export async function saveCV(cv, fileName = null) {
   await mkdir("output", {
     recursive: true
   });
-  
+
+  const name = fileName || defaultName();
+
   await writeFile(
-    `output/CV-${userName}.json`,
+    `output/${name}.json`,
     JSON.stringify(cv, null, 2),
     "utf-8"
   );
 }
 
-export async function saveMarkdown(markdown) {
+export async function saveMarkdown(markdown, fileName = null) {
   await mkdir("output", { recursive: true });
 
+  const name = fileName || defaultName();
+
   await writeFile(
-    `output/CV-${userName}.md`,
+    `output/${name}.md`,
     markdown,
     "utf-8"
   );
 }
 
-export async function saveHtml(html) {
+export async function saveHtml(html, fileName = null) {
   await mkdir("output", { recursive: true });
 
+  const name = fileName || defaultName();
+
   await writeFile(
-    `output/CV-${userName}.html`,
+    `output/${name}.html`,
     html,
     "utf-8"
   );

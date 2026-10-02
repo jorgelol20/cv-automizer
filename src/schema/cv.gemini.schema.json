@@ -175,6 +175,44 @@
         }
       }
     },
+    "certificates": {
+      "type": "array",
+      "description": "Certificados del candidato.",
+      "items": {
+        "type": "object",
+        "required": [
+          "title",
+          "issueDate",
+          "institution",
+          "description"
+        ],
+        "properties": {
+          "title": {
+            "type": "string",
+            "description": "Título de la certificación."
+          },
+          "issueDate": {
+            "type": "string",
+            "description": "Fecha de expedición del certificado."
+          },
+          "endDate": {
+            "type": "string",
+            "description": "Fecha de caducidad del certificado."
+          },
+          "institution": {
+            "type": "string",
+            "description": "Institución emisora."
+          },
+          "description": {
+            "type": "array",
+            "description": "Información relevante de la certificación.",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
     "languages": {
       "type": "array",
       "description": "Idiomas humanos del candidato. Nunca incluir lenguajes de programación.",
@@ -233,6 +271,10 @@
         "github": {
           "type": "string",
           "description": "URL de GitHub."
+        },
+        "portfolio": {
+          "type": "string",
+          "description": "URL de del portfolio."
         }
       }
     }

@@ -50,6 +50,12 @@ contextBridge.exposeInMainWorld(
     showOutputFolder: () =>
       ipcRenderer.invoke(
         "show-output-folder"
+      ),
+
+    generateGeneralKit: (options) =>
+      ipcRenderer.invoke(
+        "generate-general-kit",
+        options
       )
   }
 );

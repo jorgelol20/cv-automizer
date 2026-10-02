@@ -6,7 +6,7 @@ import { parseUserInfo } from "./cv/source.js";
 import { buildPrompt } from "./ai/prompt.js";
 import { createAIProvider } from "./ai/factory.js";
 
-import { validateCV } from "./cv/validate.js";
+import { validateCV, validateMatch } from "./cv/validate.js";
 import { enforceTraceability } from "./cv/traceability.js";
 
 import { renderMarkdown } from "./render/markdown.js";
@@ -17,6 +17,10 @@ import {
     saveMarkdown,
     saveHtml
 } from "./output/files.js";
+
+import {
+    buildCVBaseFileName
+} from "./output/naming.js";
 
 import { generatePdf } from "./pdf/pdf.js";
 
@@ -34,7 +38,10 @@ import matchSchema from "./schema/cv.match.schema.json" with {
 
 export async function generateCV({
     provider: providerId,
-    model
+    model,
+    layout = "standard",
+    companyName = "",
+    companyType = ""
 }) {
     const {
         userInfo,
@@ -47,13 +54,19 @@ export async function generateCV({
     const provider =
         createAIProvider(providerId);
 
+    // Construir prompt adaptado si hay empresa
+    const effectiveJobOffer = companyName
+        ? `CANDIDATURA ESPONTÁNEA\n\nEmpresa: ${companyName}\nTipo: ${companyType}\n\nEl candidato se postula de forma espontánea a esta empresa. Adapta el CV para destacar los aspectos más relevantes para este tipo de empresa.`
+        : jobOffer;
+
     const {
         system,
         prompt
     } = await buildPrompt({
         userInfo,
-        jobOffer,
-        schema
+        jobOffer: effectiveJobOffer,
+        schema,
+        layout
     });
 
     const result =
@@ -62,7 +75,7 @@ export async function generateCV({
             userPrompt: prompt,
             model,
             temperature: 0.2,
-            maxTokens: 8192,
+            maxTokens: 16384,
             schema
         });
 
@@ -82,7 +95,7 @@ export async function generateCV({
     const matchPrompt =
         buildMatchPrompt({
             cv,
-            jobOffer
+            jobOffer: effectiveJobOffer
         });
 
     console.log();
@@ -107,6 +120,26 @@ export async function generateCV({
     }
 
     const match = matchResult.parsed;
+
+    const matchValidation =
+        validateMatch(
+            match,
+            matchSchema
+        );
+
+    if (!matchValidation.valid) {
+        const errors =
+            matchValidation.errors
+                .map(
+                    (error) =>
+                        `${error.instancePath || "/"}: ${error.message}`
+                )
+                .join("\n");
+
+        throw new Error(
+            `El evaluador devolvió un resultado inválido:\n${errors}`
+        );
+    }
 
     console.log(
         `🎯 Match: ${match.score}/100`
@@ -143,23 +176,26 @@ export async function generateCV({
         );
     }
 
-    await saveCV(cv);
+    const baseFileName = buildCVBaseFileName(companyName);
 
-    const fileName = process.env.NOMBRE_ARCHIVO.replaceAll(' ', '');
+    await saveCV(cv, baseFileName);
 
     const markdown =
         renderMarkdown(cv);
 
-    await saveMarkdown(markdown);
+    await saveMarkdown(markdown, baseFileName);
 
     const html =
-        await renderHtml(cv);
+        await renderHtml(
+            cv,
+            { layout }
+        );
 
-    await saveHtml(html);
+    await saveHtml(html, baseFileName);
 
     await generatePdf(
         html,
-        `output/CV-${fileName}.pdf`
+        `output/${baseFileName}.pdf`
     );
 
 
@@ -172,10 +208,10 @@ export async function generateCV({
         match,
 
         output: {
-            json: `output/CV-${fileName}.json`,
-            markdown: `output/CV-${fileName}.md`,
-            html: `output/CV-${fileName}.html`,
-            pdf: `output/CV-${fileName}.pdf`
+            json: `output/${baseFileName}.json`,
+            markdown: `output/${baseFileName}.md`,
+            html: `output/${baseFileName}.html`,
+            pdf: `output/${baseFileName}.pdf`
         },
 
         metrics: {

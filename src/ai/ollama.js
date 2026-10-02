@@ -1,5 +1,28 @@
 import { AIProvider } from "./provider.js";
 
+function extractJson(text) {
+  let cleaned = String(text ?? "").trim();
+
+  // Quitar cercas de código Markdown (```json ... ```)
+  const fenceMatch = cleaned.match(
+    /```(?:json)?\s*([\s\S]*?)```/
+  );
+
+  if (fenceMatch) {
+    cleaned = fenceMatch[1].trim();
+  }
+
+  // Quedarse con el bloque entre la primera { y la última }
+  const start = cleaned.indexOf("{");
+  const end = cleaned.lastIndexOf("}");
+
+  if (start !== -1 && end !== -1 && end > start) {
+    cleaned = cleaned.slice(start, end + 1);
+  }
+
+  return cleaned;
+}
+
 export class OllamaProvider extends AIProvider {
   constructor({
     baseUrl =
@@ -19,7 +42,7 @@ export class OllamaProvider extends AIProvider {
     userPrompt,
     model,
     temperature = 0.2,
-    maxTokens = 16384,
+    maxTokens = 8192,
     schema
   }) {
     const started = performance.now();
@@ -48,6 +71,32 @@ export class OllamaProvider extends AIProvider {
       );
     }
 
+    const numPredict = maxTokens;
+
+    // El prompt del proyecto es grande (UserInfo + schemas):
+    // si num_ctx es menor que prompt + salida, Ollama corta
+    // la respuesta (done_reason "length") y el JSON sale truncado.
+    const approxPromptTokens = Math.ceil(
+      (systemPrompt.length + userPrompt.length) / 4
+    );
+
+    const numCtx = Math.min(
+      32768,
+      Math.max(
+        8192,
+        Math.ceil(
+          (approxPromptTokens + numPredict + 512) / 1024
+        ) * 1024
+      )
+    );
+
+    if (approxPromptTokens + numPredict + 512 > 32768) {
+      throw new Error(
+        "Ollama: el prompt + salida estimada supera el contexto máximo " +
+        "configurado (32768 tokens). Reduce UserInfo.md o usa Gemini."
+      );
+    }
+
     const body = {
       model,
       system: systemPrompt,
@@ -56,7 +105,8 @@ export class OllamaProvider extends AIProvider {
       think: false,
       options: {
         temperature,
-        num_predict: maxTokens
+        num_predict: numPredict,
+        num_ctx: numCtx
       }
     };
 
@@ -102,14 +152,27 @@ export class OllamaProvider extends AIProvider {
 
       let parsed = null;
 
+      const doneReason = data.done_reason ?? null;
+
       if (schema) {
+        if (doneReason === "length") {
+          throw new Error(
+            "Ollama truncó la respuesta (done_reason: length). " +
+            `prompt_tokens=${data.prompt_eval_count ?? "?"} ` +
+            `output_tokens=${data.eval_count ?? "?"} ` +
+            `num_ctx=${numCtx} num_predict=${numPredict}. ` +
+            "Aumenta num_ctx o reduce el prompt."
+          );
+        }
+
         try {
           parsed = JSON.parse(
-            responseText
+            extractJson(responseText)
           );
         } catch (error) {
           throw new Error(
             `Ollama devolvió JSON inválido: ${error.message}` +
+            ` | done_reason=${doneReason ?? "unknown"}` +
             ` | outputChars=${responseText.length}`
           );
         }

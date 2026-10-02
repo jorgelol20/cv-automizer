@@ -1,2 +1,1 @@
-Oferta de trabajo.
-Mejor si es en MD.
+Oferta programador frontend react
