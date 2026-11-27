@@ -3,6 +3,18 @@
 Todas las novedades relevantes de CV Automizer se documentan aquí.
 El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
 
+## [0.10.0] - 2026-11-27
+
+### Añadido
+
+- Generación de PDF sin Chrome: el escritorio usa el Chromium integrado de Electron y la CLI/TUI usan un navegador del sistema o descargan el Chromium de Playwright la primera vez.
+- Script `npm run pdf:browser` para preparar el Chromium de Playwright antes de generar PDF.
+
+### Cambiado
+
+- `CHROME_ROUTE` pasa a ser opcional: solo sirve para forzar un Chrome/Chromium concreto.
+- `start.bat` ya no avisa por `CHROME_ROUTE`; el escritorio no necesita navegador externo.
+
 ## [0.9.0] - 2026-11-27
 
 Primera beta pública.
@@ -41,4 +53,5 @@ Primera beta pública.
 - La generación de PDF requiere Chrome/Chromium y `CHROME_ROUTE`.
 - Las pruebas con claves reales de Claude, Gemini, Groq y OpenCode Go siguen pendientes de validación completa.
 
+[0.10.0]: https://github.com/jorgelol20/cv-automizer/releases/tag/v0.10.0
 [0.9.0]: https://github.com/jorgelol20/cv-automizer/releases/tag/v0.9.0

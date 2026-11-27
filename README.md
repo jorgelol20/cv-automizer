@@ -6,7 +6,7 @@ El proyecto utiliza una fuente de datos estructurada en Markdown con la informac
 
 Actualmente dispone de una interfaz de escritorio basada en Electron, una interfaz de terminal (TUI) y mantiene también un modo CLI.
 
-> **Estado:** beta pública `0.9.0` (noviembre de 2026). El flujo principal es estable, pero algunas integraciones con proveedores aún no se han validado con claves reales. Consulta las [limitaciones conocidas](#limitaciones-conocidas).
+> **Estado:** beta pública `0.10.0` (noviembre de 2026). El flujo principal es estable, pero algunas integraciones con proveedores aún no se han validado con claves reales. Consulta las [limitaciones conocidas](#limitaciones-conocidas).
 
 ---
 
@@ -21,7 +21,7 @@ Actualmente dispone de una interfaz de escritorio basada en Electron, una interf
 - Gestión de API Keys desde la CLI, el escritorio y la TUI (valores enmascarados).
 - Configuración local de modelo favorito, temperatura y tokens por proveedor.
 - Edición de `UserInfo.md` y `oferta.md` desde el escritorio y la TUI.
-- Generación de JSON, Markdown, HTML y PDF.
+- Generación de JSON, Markdown, HTML y PDF (sin necesidad de instalar Chrome).
 - Interfaz de terminal (TUI) con pestañas, editor de perfil/oferta y registro de progreso.
 - Previsualización del HTML generado dentro del escritorio.
 - Apertura directa del HTML y PDF generado.
@@ -38,9 +38,10 @@ Actualmente dispone de una interfaz de escritorio basada en Electron, una interf
 
 - Node.js 22.12 o superior
 - npm
-- Chrome o Chromium (necesario para generar PDF)
 - Ollama (si se utilizan modelos locales)
 - Al menos una API key de Gemini, OpenCode Zen, OpenCode Go, Claude o Groq (si no se usa Ollama)
+
+Para generar PDF no hace falta tener Chrome instalado. El escritorio usa el Chromium que ya incluye Electron; la CLI y la TUI usan el Chromium de Playwright, un Chrome/Edge del sistema o lo descargan automáticamente la primera vez (unos 130 MB). También puedes prepararlo antes con `npm run pdf:browser`.
 
 La TUI es opcional y necesita **Node.js 26.4 o superior** con `--experimental-ffi` (el script `npm run tui` ya lo añade), o Bun 1.3+.
 
@@ -111,7 +112,10 @@ GEMINI_API_KEY=
 ANTHROPIC_API_KEY=
 GROQ_API_KEY=
 
+# Opcional: ruta a un Chrome/Chromium concreto para los PDF.
 CHROME_ROUTE=
+# Opcional: fuerza el motor de PDF ("electron" solo en escritorio, "playwright").
+# PDF_ENGINE=
 ```
 
 ### Variables
@@ -126,7 +130,8 @@ CHROME_ROUTE=
 | `GEMINI_API_KEY` | Para Gemini | Clave de Google AI Studio. |
 | `ANTHROPIC_API_KEY` | Para Claude | Clave de Anthropic (`CLAUDE_API_KEY` se acepta como alias de lectura). |
 | `GROQ_API_KEY` | Para Groq | Clave de Groq. |
-| `CHROME_ROUTE` | Para PDF | Ruta al ejecutable de Chrome/Chromium. |
+| `CHROME_ROUTE` | No | Ruta a un Chrome/Chromium concreto para los PDF. En CLI/TUI es la primera opción; el escritorio usa Electron salvo que definas `PDF_ENGINE=playwright`. |
+| `PDF_ENGINE` | No | `electron` o `playwright` para forzar el motor de PDF (`electron` solo funciona en el escritorio). |
 
 Las claves también se pueden guardar desde la CLI (`npm start` → opción 2), la pestaña **API Keys** del escritorio o la pestaña **API Keys** de la TUI. Nunca se muestran completas: solo `******abcd`.
 
@@ -158,6 +163,7 @@ cv-automizer/
 │   ├── app.js
 │   ├── index.html
 │   ├── main.cjs
+│   ├── pdf.cjs
 │   ├── preload.cjs
 │   └── style.css
 │
@@ -204,7 +210,8 @@ cv-automizer/
 │   │   └── naming.js
 │   │
 │   ├── pdf/
-│   │   └── pdf.js
+│   │   ├── pdf.js
+│   │   └── test-pdf.js
 │   │
 │   ├── render/
 │   │   ├── escape.js
@@ -634,6 +641,12 @@ node src/config/test-source.js
 node src/config/test-modelos.js
 ```
 
+Para comprobar el motor de PDF sin llamar a ningún proveedor de IA:
+
+```bash
+node src/pdf/test-pdf.js
+```
+
 ---
 
 ## Tecnologías
@@ -660,7 +673,7 @@ El proyecto utiliza principalmente:
 ## Limitaciones conocidas
 
 - Beta orientada a Windows. La CLI y el escritorio usan APIs multiplataforma, pero el flujo principal se prueba en Windows.
-- La generación de PDF necesita Chrome/Chromium y `CHROME_ROUTE`; sin ella se generan el resto de formatos.
+- La generación de PDF no requiere Chrome: el escritorio usa Electron y la CLI/TUI usan Playwright. Si no encuentra ningún navegador, la primera generación descarga Chromium (necesita conexión).
 - La TUI exige Node 26.4+ por la librería nativa de OpenTUI.
 - Ollama, OpenCode Zen, OpenCode Go, Claude, Gemini y Groq están implementados, pero las pruebas con claves reales de Claude, Gemini, Groq y OpenCode Go aún no cubren todos los modelos y casos.
 - No hay suite de tests formal: el proyecto incluye scripts de comprobación y un smoke test de la TUI.
