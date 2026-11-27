@@ -1,12 +1,13 @@
 {
   "name": "cv-automizer",
-  "version": "0.9.0",
+  "version": "0.10.0",
   "description": "Generador de CVs personalizados mediante IA",
   "private": true,
   "scripts": {
     "start": "node src/index.js",
     "tui": "node --experimental-ffi src/tui/index.js",
-    "desktop": "electron desktop/main.cjs"
+    "desktop": "electron desktop/main.cjs",
+    "pdf:browser": "playwright install chromium"
   },
   "keywords": [
     "cv",

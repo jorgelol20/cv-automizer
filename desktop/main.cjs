@@ -201,6 +201,29 @@ function createWindow() {
   );
 }
 
+// Motor de PDF del escritorio: usa el Chromium que ya trae Electron, así que
+// no depende de Chrome, Chromium ni descargas adicionales.
+async function registrarMotorPdf() {
+  try {
+    const { setPdfEngine } = await import(
+      "../src/pdf/pdf.js"
+    );
+
+    const { generarPdfConElectron } = require("./pdf.cjs");
+
+    setPdfEngine((html, outputPath) =>
+      generarPdfConElectron(
+        html,
+        path.resolve(projectRoot, outputPath)
+      )
+    );
+  } catch (error) {
+    console.error(
+      `No se pudo registrar el motor de PDF de Electron: ${error.message}`
+    );
+  }
+}
+
 ipcMain.handle(
   "get-input-files",
   async () => {
@@ -764,7 +787,9 @@ ipcMain.handle(
   }
 );
 
-app.whenReady().then(() => {
+app.whenReady().then(async () => {
+  await registrarMotorPdf();
+
   createWindow();
 
   app.on(

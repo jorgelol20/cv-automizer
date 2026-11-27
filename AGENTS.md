@@ -22,12 +22,13 @@ npm run desktop          # Run Electron desktop app
 node src/cv/test-source.js  # Test UserInfo.md parser (prints parsed JSON)
 node src/config/test-source.js  # Test API keys status (masked)
 node src/config/test-modelos.js  # Test modelos config (effective values)
+node src/pdf/test-pdf.js         # Test PDF engine (no AI call)
 node --experimental-ffi src/tui/test-screens.js  # Headless TUI smoke test (frames)
 ```
 
 There is **no build step, test framework, linter, or type checker**. Plain Node.js ES modules. The TUI is Core imperative (no JSX, no transpiler).
 
-`start.bat` (Windows, doble clic o terminal): exige Node.js 22.12+, usa npm, auto-ejecuta `npm install` si falta `node_modules`, crea `.env` desde `.env.example` si falta, copia las plantillas de `data/` si faltan, avisa (sin bloquear) si `CHROME_ROUTE` no apunta a un fichero válido, y hace `pause` siempre. Usa `call` con npm y `cd /d "%~dp0"`.
+`start.bat` (Windows, doble clic o terminal): exige Node.js 22.12+, usa npm, auto-ejecuta `npm install` si falta `node_modules`, crea `.env` desde `.env.example` si falta, copia las plantillas de `data/` si faltan y hace `pause` siempre. No comprueba Chrome: el PDF del escritorio usa el Chromium de Electron. Usa `call` con npm y `cd /d "%~dp0"`.
 
 ## Architecture
 
@@ -60,7 +61,7 @@ data/oferta.md   → JOB_OFFER
                         ↓
               renderMarkdown() / renderHtml() → saveCV/saveMarkdown/saveHtml
                         ↓
-              generatePdf() via Playwright → output/*.pdf
+              generatePdf() (Electron en escritorio, Playwright en CLI/TUI) → output/*.pdf
 ```
 
 ### Key Directories
@@ -80,7 +81,7 @@ data/oferta.md   → JOB_OFFER
 | `ia/` | System and user prompt templates (loaded at runtime) |
 | `data/` | Input files: `UserInfo.md`, `oferta.md`, optional `ImagenUsuario.*` |
 | `output/` | Generated files (JSON, MD, HTML, PDF) |
-| `desktop/` | Electron app (main.cjs, preload.cjs, index.html, app.js) |
+| `desktop/` | Electron app (main.cjs, pdf.cjs, preload.cjs, index.html, app.js) |
 
 ## Critical Environment Variables
 
@@ -88,7 +89,8 @@ Copy `.env.example` to `.env` and configure. Model tuning lives in `config/model
 
 | Variable | Required | Purpose |
 |----------|----------|---------|
-| `CHROME_ROUTE` | **Yes** (for PDF) | Path to Chromium executable (e.g., `C:\Users\...\chrome.exe`) |
+| `CHROME_ROUTE` | No (PDF override) | Path to a specific Chrome/Chromium executable for PDF (e.g., `C:\Users\...\chrome.exe`). Empty = automatic engine |
+| `PDF_ENGINE` | No | `electron` (desktop only) or `playwright` forces the PDF engine |
 | `OPENCODE_ZEN_API_KEY` | For OpenCode Zen | OpenCode Zen API key (`OPENCODE_API_KEY` leído como alias legacy) |
 | `OPENCODE_GO_API_KEY` | For OpenCode Go | OpenCode Go API key (`OPENCODE_API_KEY` leído como alias) |
 | `GEMINI_API_KEY` | For Gemini | Google Gemini API key |
@@ -102,7 +104,13 @@ Copy `.env.example` to `.env` and configure. Model tuning lives in `config/model
 
 ## PDF Generation
 
-PDF is generated via **Playwright** with a system Chromium. The `CHROME_ROUTE` env var must point to a valid `chrome.exe`. Without it, PDF generation fails (the error is reported in Spanish before launching).
+PDF generation **does not require the user to install Chrome**. `src/pdf/pdf.js` resolves the engine in this order:
+
+1. A registered engine (`setPdfEngine`). The desktop registers `desktop/pdf.cjs`, which prints with the Chromium bundled in Electron (`webContents.printToPDF`), so desktop users need no extra browser or download.
+2. Without a registered engine (CLI/TUI), Playwright tries: `CHROME_ROUTE` (optional override) → Playwright's own Chromium → installed Google Chrome (channel) → installed Microsoft Edge (channel) → `playwright install chromium` once (~130 MB, announced through `aviso()`). `npm run pdf:browser` provisions the browser manually.
+3. `PDF_ENGINE=electron|playwright` forces a path; `electron` only works inside the desktop app.
+
+Every path prints A4 with `printBackground`, `preferCSSPageSize` and zero margins (the real margins come from `@page` in `src/render/style.css`) and waits for `document.fonts.ready`. If the registered engine fails, it warns and retries with Playwright.
 
 The CV HTML embeds the Inter variable font as a base64 `@font-face` (`src/render/fonts/inter-latin-var.woff2`, OFL), so the PDF renders the same on any machine. `generatePdf` waits for `document.fonts.ready` before printing. The cover letter and email keep a Georgia serif stack and do not embed a font.
 

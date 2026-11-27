@@ -144,13 +144,6 @@ export function crearPantallaGenerar({ renderer, app }) {
                 COLORS.accent
             );
 
-            if (!process.env.CHROME_ROUTE?.trim()) {
-                log.escribir(
-                    "⚠️ CHROME_ROUTE vacío: el PDF fallará (JSON/MD/HTML sí se guardan).",
-                    COLORS.warn
-                );
-            }
-
             const resultado = await generateCV({
                 provider: selectorIA.provider,
                 model: selectorIA.model,

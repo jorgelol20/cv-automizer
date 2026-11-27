@@ -1,5 +1,5 @@
 @echo off
-REM Arranque de CV-Automizer (app de escritorio). Verifica Node, dependencias, .env y Chrome.
+REM Arranque de CV-Automizer (app de escritorio). Verifica Node, dependencias, .env y datos.
 REM Sin chcp ni tildes: chcp 65001 rompe la salida si stdout va a pipe/fichero.
 cd /d "%~dp0"
 
@@ -95,32 +95,16 @@ if exist "data\UserInfo.example.md" (
   echo Se ha creado data\UserInfo.md desde la plantilla. Editalo con tus datos.
 )
 :CheckOffer
-if exist "data\oferta.md" goto :CheckChrome
+if exist "data\oferta.md" goto :CheckPdf
 if exist "data\oferta.example.md" (
   copy /y "data\oferta.example.md" "data\oferta.md" >nul
   echo Se ha creado data\oferta.md desde la plantilla. Editala con la oferta.
 )
-goto :CheckChrome
+goto :CheckPdf
 
-:CheckChrome
-REM --- 7. CHROME_ROUTE (aviso no bloqueante, solo afecta al PDF) ---
-set "CHROME_PATH="
-if not exist ".env" goto :NoChromeVar
-for /f "usebackq tokens=1* delims==" %%A in (`findstr "^CHROME_ROUTE=" ".env" 2^>nul`) do set "CHROME_PATH=%%B"
-set CHROME_PATH=%CHROME_PATH:"=%
-set CHROME_PATH=%CHROME_PATH:\\=\%
-for /f "tokens=* delims= " %%S in ("%CHROME_PATH%") do set "CHROME_PATH=%%S"
-if "%CHROME_PATH%"=="" goto :NoChromeVar
-if not exist "%CHROME_PATH%" goto :BadChrome
-echo Chrome/Chromium OK: %CHROME_PATH%.
-goto :Launch
-
-:NoChromeVar
-echo Aviso: CHROME_ROUTE no definido en .env. La app arrancara, pero el PDF fallara.
-goto :Launch
-
-:BadChrome
-echo Aviso: CHROME_ROUTE apunta a "%CHROME_PATH%" que no existe. La app arrancara, pero el PDF fallara.
+:CheckPdf
+REM --- 7. PDF: el escritorio usa el Chromium integrado de Electron ---
+echo PDF: motor integrado de Electron (no hace falta Chrome ni Chromium).
 goto :Launch
 
 :Launch
