@@ -6,22 +6,24 @@ El proyecto utiliza una fuente de datos estructurada en Markdown con la informac
 
 Actualmente dispone de una interfaz de escritorio basada en Electron, una interfaz de terminal (TUI) y mantiene también un modo CLI.
 
-> **Estado:** beta pública `0.9.0` (noviembre de 2026). El proyecto es funcional y se usa a diario, pero algunas integraciones con proveedores aún no se han validado con claves reales. Consulta las [limitaciones conocidas](#limitaciones-conocidas).
+> **Estado:** beta pública `0.9.0` (noviembre de 2026). El flujo principal es estable, pero algunas integraciones con proveedores aún no se han validado con claves reales. Consulta las [limitaciones conocidas](#limitaciones-conocidas).
 
 ---
 
 ## Características
 
 - Generación de CV adaptado a una oferta de empleo.
+- Puntuación de encaje (match) entre el CV y la oferta, opcional.
+- Dos layouts de CV: estándar y una página.
 - Kit de candidatura espontánea: carta, email y CV adaptado a la empresa.
 - Proveedores: Ollama, Google Gemini, OpenCode Zen, OpenCode Go, Claude (Anthropic) y Groq.
 - Selección de proveedor y modelo desde la aplicación.
-- Gestión de API Keys desde la CLI y el escritorio (valores enmascarados).
+- Gestión de API Keys desde la CLI, el escritorio y la TUI (valores enmascarados).
 - Configuración local de modelo favorito, temperatura y tokens por proveedor.
-- Edición de `UserInfo.md` y `oferta.md` desde la interfaz.
+- Edición de `UserInfo.md` y `oferta.md` desde el escritorio y la TUI.
 - Generación de JSON, Markdown, HTML y PDF.
 - Interfaz de terminal (TUI) con pestañas, editor de perfil/oferta y registro de progreso.
-- Previsualización del HTML generado dentro de la aplicación.
+- Previsualización del HTML generado dentro del escritorio.
 - Apertura directa del HTML y PDF generado.
 - Apertura de la carpeta de salida.
 - Soporte opcional para una imagen de usuario.
@@ -63,6 +65,12 @@ Instalar dependencias:
 npm install
 ```
 
+### Desde la release
+
+Si prefieres no clonar el repositorio, descarga el ZIP de la [última release](https://github.com/jorgelol20/cv-automizer/releases).
+
+Descomprímelo y ejecuta `npm install` dentro de la carpeta.
+
 ## Primer arranque
 
 La aplicación necesita dos ficheros locales que no se versionan:
@@ -70,7 +78,7 @@ La aplicación necesita dos ficheros locales que no se versionan:
 - `data/UserInfo.md`: tu perfil.
 - `data/oferta.md`: la oferta a la que adaptar el CV.
 
-`start.bat` los crea automáticamente desde las plantillas la primera vez. Si arrancas con `npm start` o `npm run desktop`, cópialos a mano:
+`start.bat` los crea automáticamente desde las plantillas la primera vez. El escritorio y la TUI también cargan la plantilla si el fichero aún no existe y avisan al guardar. Si arrancas solo con `npm start`, cópialos a mano (la CLI avisa si faltan):
 
 ```bat
 copy data\UserInfo.example.md data\UserInfo.md
@@ -84,7 +92,7 @@ cp data/UserInfo.example.md data/UserInfo.md
 cp data/oferta.example.md data/oferta.md
 ```
 
-Edita ambos ficheros antes de generar. El escritorio y la TUI también cargan la plantilla si el fichero aún no existe y avisan de que hay que guardarla.
+Edita ambos ficheros antes de generar.
 
 ---
 
@@ -113,10 +121,10 @@ CHROME_ROUTE=
 | `NOMBRE_USUARIO` | No | Sobrescribe el nombre del candidato en la salida. |
 | `NOMBRE_ARCHIVO` | No | Nombre base de los ficheros generados (sin espacios). |
 | `OLLAMA_BASE_URL` | No | URL del servidor local de Ollama. |
-| `OPENCODE_ZEN_API_KEY` | Para OpenCode Zen | Clave de OpenCode Zen. |
+| `OPENCODE_ZEN_API_KEY` | Para OpenCode Zen | Clave de OpenCode Zen (`OPENCODE_API_KEY` se acepta como alias de lectura). |
 | `OPENCODE_GO_API_KEY` | Para OpenCode Go | Clave con suscripción Go (`OPENCODE_API_KEY` se acepta como alias de lectura). |
 | `GEMINI_API_KEY` | Para Gemini | Clave de Google AI Studio. |
-| `ANTHROPIC_API_KEY` | Para Claude | Clave de Anthropic. |
+| `ANTHROPIC_API_KEY` | Para Claude | Clave de Anthropic (`CLAUDE_API_KEY` se acepta como alias de lectura). |
 | `GROQ_API_KEY` | Para Groq | Clave de Groq. |
 | `CHROME_ROUTE` | Para PDF | Ruta al ejecutable de Chrome/Chromium. |
 
@@ -135,10 +143,16 @@ CV-NombreApellido.pdf
 
 ---
 
-# Estructura del proyecto
+## Estructura del proyecto
 
 ```text
 cv-automizer/
+│
+├── .github/
+│   └── rulesets/
+│       ├── main.json
+│       ├── tags.json
+│       └── README.md
 │
 ├── desktop/
 │   ├── app.js
@@ -156,6 +170,7 @@ cv-automizer/
 │   │   ├── match.js
 │   │   ├── ollama.js
 │   │   ├── opencode.js
+│   │   ├── opencode-go.js
 │   │   ├── prompt.js
 │   │   ├── provider.js
 │   │   └── wire-schema.js
@@ -250,15 +265,16 @@ cv-automizer/
 ├── CHANGELOG.md
 ├── LICENSE
 ├── MEMORY.md
+├── package-lock.json
 ├── package.json
 └── README.md
 ```
 
 ---
 
-# Datos de entrada
+## Datos de entrada
 
-## `data/UserInfo.md`
+### `data/UserInfo.md`
 
 Contiene la información real del candidato. Es local y está ignorado por git.
 
@@ -268,7 +284,7 @@ La información debe ser explícita y estructurada. Usa `data/UserInfo.example.m
 
 ---
 
-## `data/oferta.md`
+### `data/oferta.md`
 
 Contiene la oferta de empleo utilizada para adaptar el CV. También es local e ignorada por git; `data/oferta.example.md` sirve como plantilla.
 
@@ -278,7 +294,7 @@ No debe utilizarse como fuente de información personal del candidato.
 
 ---
 
-# Imagen del usuario
+## Imagen del usuario
 
 La aplicación puede incluir una imagen del candidato automáticamente.
 
@@ -303,7 +319,7 @@ La imagen se incrusta como `data:` URL para que también esté disponible en la 
 
 ---
 
-# Flujo de generación
+## Flujo de generación
 
 El flujo del programa principal es:
 
@@ -344,11 +360,11 @@ parseUserInfo()
 
 ---
 
-# Proveedores de IA
+## Proveedores de IA
 
 Todos los proveedores se configuran desde la aplicación: la clave en la CLI (opción 2) o en la pestaña **API Keys**, y el modelo en la CLI (opción 3) o en la pestaña **Modelos**.
 
-## Ollama
+### Ollama
 
 Permite utilizar modelos instalados localmente, sin clave.
 
@@ -360,19 +376,19 @@ La aplicación obtiene los modelos instalados mediante la API de Ollama.
 
 ---
 
-## Google Gemini
+### Google Gemini
 
 Requiere `GEMINI_API_KEY`. Los modelos se obtienen dinámicamente de la API.
 
 ---
 
-## OpenCode Zen
+### OpenCode Zen
 
 Requiere `OPENCODE_ZEN_API_KEY` (`OPENCODE_API_KEY` se acepta como alias de lectura). Usa la capa gratuita y el endpoint `chat/completions`.
 
 ---
 
-## OpenCode Go
+### OpenCode Go
 
 Requiere `OPENCODE_GO_API_KEY` (la documentación de Go usa `OPENCODE_API_KEY`, aceptada como alias de lectura). Es la suscripción de pago de OpenCode y usa el endpoint OpenAI-compatible `POST https://opencode.ai/inference/go/openai/v1/chat/completions`.
 
@@ -380,19 +396,19 @@ Cada petición envía `x-opencode-session`, obligatorio para el servicio. El sch
 
 ---
 
-## Claude (Anthropic)
+### Claude (Anthropic)
 
 Requiere `ANTHROPIC_API_KEY` (`CLAUDE_API_KEY` como alias de lectura). Usa `POST /v1/messages` con `fetch` nativo.
 
 ---
 
-## Groq
+### Groq
 
 Requiere `GROQ_API_KEY`. Es compatible con OpenAI (`POST /openai/v1/chat/completions`) y usa `response_format: { type: "json_object" }`.
 
 ---
 
-# Interfaz de escritorio
+## Interfaz de escritorio
 
 La aplicación de escritorio está desarrollada con Electron.
 
@@ -412,6 +428,8 @@ La interfaz permite:
 * gestionar API Keys;
 * generar el CV;
 * generar el kit de candidatura espontánea (carta, email y CV);
+* ver el progreso de la generación por etapas;
+* avisar de cambios sin guardar antes de cerrar;
 * visualizar el resultado;
 * abrir el HTML;
 * abrir el PDF;
@@ -419,7 +437,7 @@ La interfaz permite:
 
 ---
 
-# Interfaz de terminal (TUI)
+## Interfaz de terminal (TUI)
 
 La TUI usa [OpenTUI](https://github.com/sst/opentui) sobre una librería nativa. Se arranca con:
 
@@ -445,7 +463,7 @@ Pestañas (teclas `1`–`5`):
 
 Atajos: `TAB` cambia de campo, `ENTER` elige/edita, `ESC` cancela, `q` sale.
 En Específica: `g` genera, `r` recarga modelos, `o` abre el PDF y `f` la carpeta `output/`.
-En General: `g` genera, `o` abre el CV, `c` la carta y `f` la carpeta.
+En General: `g` genera, `r` recarga modelos, `o` abre el CV, `c` la carta y `f` la carpeta.
 
 La TUI no previsualiza HTML ni PDF dentro del terminal: abre los ficheros con la aplicación del sistema. Comparte el mismo pipeline (`src/app.js`, `src/general/generate.js`) que la CLI y el escritorio; el progreso llega por `onProgress` para no escribir en stdout y romper el frame.
 
@@ -457,7 +475,7 @@ node --experimental-ffi src/tui/test-screens.js
 
 ---
 
-# CLI
+## CLI
 
 El proyecto también puede ejecutarse desde consola:
 
@@ -465,11 +483,11 @@ El proyecto también puede ejecutarse desde consola:
 npm start
 ```
 
-El CLI permite seleccionar proveedor y modelo y ejecutar el mismo pipeline de generación.
+La CLI permite seleccionar proveedor y modelo y ejecutar el mismo pipeline de generación. También incluye la gestión de claves (opción 2) y la configuración de modelos (opción 3).
 
 ---
 
-# Archivos generados
+## Archivos generados
 
 Los archivos se almacenan en:
 
@@ -477,13 +495,9 @@ Los archivos se almacenan en:
 output/
 ```
 
-El nombre depende de:
+El nombre depende de `NOMBRE_ARCHIVO` (o `NOMBRE_USUARIO`) y, en el kit general, también del nombre de la empresa. Si no se define ninguno, se usa `Candidato`. Los espacios y los caracteres no válidos para Windows se eliminan.
 
-```env
-NOMBRE_ARCHIVO
-```
-
-Ejemplo:
+CV específico:
 
 ```text
 output/
@@ -493,9 +507,23 @@ output/
 └── CV-NombreApellido.pdf
 ```
 
+Kit general (carta, email y CV adaptado a la empresa):
+
+```text
+output/
+├── General-Empresa-Carta.md
+├── General-Empresa-Carta.pdf
+├── General-Empresa-Email.html
+├── General-Empresa-Email.pdf
+├── CV-NombreApellido-Empresa.json
+├── CV-NombreApellido-Empresa.md
+├── CV-NombreApellido-Empresa.html
+└── CV-NombreApellido-Empresa.pdf
+```
+
 ---
 
-# JSON Schema
+## JSON Schema
 
 El CV generado se valida mediante JSON Schema.
 
@@ -505,7 +533,7 @@ Schema principal:
 src/schema/cv.schema.json
 ```
 
-Para la respuesta estructurada, Gemini y Claude reciben una versión saneada del schema canónico (sin `$schema`, `minLength`, `additionalProperties` ni restricciones numéricas) generada por `src/ai/wire-schema.js`. El contrato que se valida siempre es el canónico.
+Para la respuesta estructurada, Gemini, Claude y OpenCode Go reciben una versión saneada del schema canónico generada por `src/ai/wire-schema.js`: se eliminan las palabras clave que sus APIs no aceptan (`$schema`, `minLength`, `pattern`, `format` y las restricciones numéricas, entre otras). Gemini elimina además `additionalProperties`; OpenCode Go lo fija a `false` y marca todas las propiedades como `required` en modo estricto. Groq usa `response_format: { type: "json_object" }`. El contrato que se valida siempre es el canónico con AJV.
 
 El match y el kit general tienen sus propios esquemas:
 
@@ -518,7 +546,7 @@ La validación evita que el resultado final tenga una estructura incompatible co
 
 ---
 
-# Trazabilidad
+## Trazabilidad
 
 Una de las reglas principales del proyecto es que la IA no debe inventar información del candidato.
 
@@ -551,7 +579,7 @@ ia/prompt.md
 
 ---
 
-# Título profesional
+## Título profesional
 
 El campo `title` puede adaptarse automáticamente a la oferta.
 
@@ -567,7 +595,7 @@ puede adaptarse a un puesto objetivo relacionado con backend.
 
 ---
 
-# Desarrollo
+## Desarrollo
 
 Para ejecutar el proyecto en modo CLI:
 
@@ -593,7 +621,7 @@ Para probar las pantallas de la TUI sin terminal interactiva:
 node --experimental-ffi src/tui/test-screens.js
 ```
 
-Para probar el parser del perfil:
+Para probar el parser del perfil (si falta `data/UserInfo.md`, usa `data/UserInfo.example.md`):
 
 ```bash
 node src/cv/test-source.js
@@ -608,7 +636,7 @@ node src/config/test-modelos.js
 
 ---
 
-# Tecnologías
+## Tecnologías
 
 El proyecto utiliza principalmente:
 
@@ -629,18 +657,18 @@ El proyecto utiliza principalmente:
 
 ---
 
-# Limitaciones conocidas
+## Limitaciones conocidas
 
 - Beta orientada a Windows. La CLI y el escritorio usan APIs multiplataforma, pero el flujo principal se prueba en Windows.
 - La generación de PDF necesita Chrome/Chromium y `CHROME_ROUTE`; sin ella se generan el resto de formatos.
 - La TUI exige Node 26.4+ por la librería nativa de OpenTUI.
-- Ollama, OpenCode Zen, Claude, Gemini y Groq están implementados, pero las pruebas con claves reales de Claude, Gemini, Groq y OpenCode Go aún no cubren todos los modelos y casos.
+- Ollama, OpenCode Zen, OpenCode Go, Claude, Gemini y Groq están implementados, pero las pruebas con claves reales de Claude, Gemini, Groq y OpenCode Go aún no cubren todos los modelos y casos.
 - No hay suite de tests formal: el proyecto incluye scripts de comprobación y un smoke test de la TUI.
 - El escritorio no está firmado ni empaquetado como instalador; se ejecuta con `npm run desktop`.
 
 ---
 
-# Licencia
+## Licencia
 
 Código publicado bajo **0BSD**: puedes usar, copiar, modificar y distribuir el proyecto con o sin fines comerciales, sin necesidad de atribución. Consulta `LICENSE`.
 
@@ -648,7 +676,7 @@ La fuente [Inter](https://rsms.me/inter/) incluida en `src/render/fonts/` se dis
 
 ---
 
-# Objetivo del proyecto
+## Objetivo del proyecto
 
 El objetivo de CV Automizer es automatizar la creación de CVs adaptados a distintas ofertas de empleo manteniendo un equilibrio entre:
 

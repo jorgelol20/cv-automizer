@@ -29,8 +29,7 @@ const rutaEnv = path.join(
 // Solo proveedores con provider real en
 // src/ai/factory.js: gemini, opencode-zen,
 // opencode-go, claude y groq.
-// Ollama no usa key. OpenAI está en
-// .env.example pero no tiene provider.
+// Ollama no usa key. OpenAI no está implementado.
 export const KEY_DEFS = [
     {
         name: "OPENCODE_ZEN_API_KEY",
