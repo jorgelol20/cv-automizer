@@ -1,0 +1,7 @@
+node_modules/
+.env
+config/modelos.json
+output/*
+data/*
+!data/*.example.md
+.opencode/

@@ -1,0 +1,569 @@
+@page {
+    size: A4;
+    margin: 16mm 17mm;
+}
+
+:root {
+    --text: #17202a;
+    --muted: #667085;
+    --accent: #2563eb;
+    --border: #d9dee7;
+    --surface: #f6f8fb;
+    --white: #ffffff;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+html {
+    background: #e5e7eb;
+}
+
+.header {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+}
+
+.header-content {
+    flex: 1;
+}
+
+.cv-photo {
+    width: 96px;
+    height: 96px;
+    flex: 0 0 96px;
+    overflow: hidden;
+    border-radius: 50%;
+}
+
+.cv-photo img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+body {
+    margin: 0;
+    background: #e5e7eb;
+    color: var(--text);
+    font-family:
+        Inter,
+        "Segoe UI",
+        Roboto,
+        Helvetica,
+        Arial,
+        sans-serif;
+    font-size: 10.5pt;
+    line-height: 1.5;
+
+    orphans: 3;
+    widows: 3;
+}
+
+/* =========================
+   PAGE
+   ========================= */
+
+.page {
+    width: 210mm;
+    min-height: 297mm;
+    margin: 24px auto;
+    padding: 16mm 17mm;
+    background: var(--white);
+}
+
+/* =========================
+   HEADER
+   ========================= */
+
+header {
+    margin-bottom: 26px;
+    padding-bottom: 18px;
+    border-bottom: 2px solid var(--text);
+}
+
+h1 {
+    margin: 0;
+    font-size: 29pt;
+    font-weight: 750;
+    letter-spacing: -0.035em;
+    line-height: 1.05;
+}
+
+.title {
+    margin-top: 7px;
+    color: var(--accent);
+    font-size: 13pt;
+    font-weight: 650;
+    letter-spacing: 0.01em;
+}
+
+.contact {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    margin-top: 13px;
+    color: var(--muted);
+    font-size: 9pt;
+    overflow-wrap: anywhere;
+}
+
+.contact span + span::before {
+    content: "·";
+    margin: 0 8px;
+    color: var(--muted);
+}
+
+.contact-links {
+    margin-top: 5px;
+
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+
+    font-size: 9pt;
+    overflow-wrap: anywhere;
+}
+
+.contact-links a {
+    color: inherit;
+    text-decoration: none;
+}
+
+.contact-links a:hover {
+    text-decoration: underline;
+}
+
+/* =========================
+   SECTIONS
+   ========================= */
+
+section {
+    margin-top: 23px;
+    break-inside: auto;
+    page-break-inside: auto;
+}
+
+section>h2 {
+    margin: 0 0 13px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid var(--border);
+    color: var(--text);
+    font-size: 10pt;
+    font-weight: 750;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+
+    break-after: avoid;
+    page-break-after: avoid;
+}
+
+/* =========================
+   PROFILE
+   ========================= */
+
+.about {
+    max-width: 165mm;
+    margin: 0;
+    color: #344054;
+    font-size: 10.5pt;
+    line-height: 1.6;
+    overflow-wrap: anywhere;
+}
+
+.about + .about {
+    margin-top: 6px;
+}
+
+/* =========================
+   SKILLS
+   ========================= */
+
+.skill-group {
+    margin-bottom: 8px;
+}
+
+.skill-group strong {
+    color: var(--text);
+    font-size: 9pt;
+    font-weight: 700;
+    display: block;
+    margin-bottom: 2px;
+}
+
+.skill-group span {
+    color: #475467;
+    display: block;
+}
+
+/* =========================
+   ENTRIES
+   ========================= */
+
+.entry {
+    margin-bottom: 20px;
+    break-inside: auto;
+    page-break-inside: auto;
+}
+
+.entry:last-child {
+    margin-bottom: 0;
+}
+
+.entry-header,
+.dates {
+    break-after: avoid;
+    page-break-after: avoid;
+}
+
+.entry-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 20px;
+}
+
+.entry-header>div:first-child {
+    min-width: 0;
+}
+
+h3 {
+    margin: 0;
+    color: var(--text);
+    font-size: 11pt;
+    font-weight: 700;
+    line-height: 1.3;
+}
+
+.company {
+    margin-top: 3px;
+    color: #344054;
+    font-size: 9.5pt;
+    font-weight: 600;
+}
+
+.location,
+.dates {
+    color: var(--muted);
+    font-size: 8.5pt;
+}
+
+.location {
+    flex-shrink: 0;
+    max-width: 45%;
+    overflow-wrap: anywhere;
+    text-align: right;
+}
+
+.dates {
+    margin-top: 4px;
+}
+
+/* =========================
+   LISTS
+   ========================= */
+
+ul {
+    margin: 8px 0 0;
+    padding-left: 18px;
+}
+
+li {
+    margin-bottom: 4px;
+    padding-left: 2px;
+    color: #344054;
+    break-inside: avoid;
+    page-break-inside: avoid;
+}
+
+li::marker {
+    color: var(--accent);
+}
+
+a {
+    color: inherit;
+    text-decoration: none;
+    overflow-wrap: anywhere;
+}
+
+.entry h3 a {
+    color: var(--accent);
+}
+
+.entry h3 a:hover {
+    text-decoration: underline;
+}
+
+
+/* =========================
+   LANGUAGES
+   ========================= */
+
+.language {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    width: 100%;
+    padding: 5px 0;
+    border-bottom: 1px solid var(--border);
+}
+
+.language:last-child {
+    border-bottom: 0;
+}
+
+.language span:last-child {
+    color: var(--muted);
+    font-weight: 600;
+}
+
+/* =========================
+   PRINT
+   ========================= */
+
+@media print {
+
+    html,
+    body {
+        background: white;
+    }
+
+    html {
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+
+    body {
+        font-size: 10.5pt;
+    }
+
+    .page {
+        width: auto;
+        min-height: auto;
+        margin: 0;
+        padding: 0;
+    }
+
+    a {
+        color: inherit;
+        text-decoration: none;
+    }
+}
+
+/* =========================
+   SCREEN
+   ========================= */
+
+@media screen and (max-width: 900px) {
+    html {
+        background: white;
+    }
+
+    .page {
+        width: 100%;
+        min-height: 100vh;
+        margin: 0;
+        padding: 32px 24px;
+    }
+}
+
+@media screen and (max-width: 600px) {
+    h1 {
+        font-size: 24pt;
+    }
+
+    .entry-header {
+        display: block;
+    }
+
+    .location {
+        margin-top: 4px;
+        text-align: left;
+    }
+
+    .skill-group {
+        grid-template-columns: 1fr;
+        gap: 2px;
+    }
+}
+
+/* ========================================
+   ONE PAGE
+   ======================================== */
+
+.one-page {
+    font-size: 9.2pt;
+    line-height: 1.3;
+}
+
+.one-page .one-page-header {
+    margin-bottom: 12px;
+}
+
+.one-page .one-page-header h1 {
+    font-size: 27px;
+    margin-bottom: 3px;
+}
+
+.one-page .one-page-header .title {
+    font-size: 14px;
+    margin-bottom: 5px;
+}
+
+.one-page .one-page-header .contact {
+    font-size: 8.5pt;
+}
+.one-page .contact-links {
+  margin-top: 3px;
+  font-size: 8pt;
+}
+
+.one-page-columns {
+    display: grid;
+    grid-template-columns:
+        minmax(0, 34fr) minmax(0, 66fr);
+    gap: 18px;
+    align-items: start;
+    width: 100%;
+}
+
+.one-page-sidebar,
+.one-page-main {
+    min-width: 0;
+    max-width: 100%;
+}
+
+.one-page a {
+    overflow-wrap: anywhere;
+    word-break: break-word;
+}
+
+.one-page section {
+    margin-bottom: 13px;
+}
+
+.one-page section>h2 {
+    margin-bottom: 7px;
+    font-size: 12px;
+}
+
+.one-page .about {
+    margin: 0;
+    font-size: 8.8pt;
+    line-height: 1.35;
+}
+
+.one-page .about + .about {
+    margin-top: 4px;
+}
+
+.one-page .skill-group {
+    margin-bottom: 6px;
+}
+
+.one-page .skill-group strong {
+    margin-bottom: 1px;
+}
+
+.one-page .entry {
+    margin-bottom: 10px;
+    break-inside: avoid;
+    page-break-inside: avoid;
+}
+
+.one-page .entry-header {
+    gap: 8px;
+}
+
+.one-page .entry h3 {
+    margin-bottom: 2px;
+    font-size: 10.5pt;
+}
+
+.one-page .company {
+    font-size: 8.5pt;
+}
+
+.one-page .location {
+    font-size: 8pt;
+}
+
+.one-page .dates {
+    margin-top: 2px;
+    font-size: 8pt;
+}
+
+.one-page .entry ul {
+    margin-top: 4px;
+    margin-bottom: 0;
+    padding-left: 15px;
+}
+
+.one-page .entry li {
+    margin-bottom: 3px;
+    font-size: 8.3pt;
+    line-height: 1.3;
+}
+
+.one-page .language {
+    font-size: 8.5pt;
+}
+
+.one-page a {
+    overflow-wrap: anywhere;
+}
+
+.one-page .cv-photo {
+    width: 78px;
+    height: 78px;
+    flex: 0 0 78px;
+}
+
+.one-page .cv-photo img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+
+/* ========================================
+   PRINT
+   ======================================== */
+
+@media print {
+
+    .one-page {
+        font-size: 9.2pt;
+    }
+
+    .one-page-columns {
+        grid-template-columns:
+            minmax(0, 34fr) minmax(0, 66fr);
+    }
+
+    .one-page .entry {
+        break-inside: avoid;
+        page-break-inside: avoid;
+    }
+}
+
+
+/* ========================================
+   RESPONSIVE PREVIEW
+   ======================================== */
+
+@media screen and (max-width: 800px) {
+
+    .one-page-columns {
+        grid-template-columns: 1fr;
+    }
+
+    .one-page-sidebar,
+    .one-page-main {
+        width: 100%;
+    }
+
+}

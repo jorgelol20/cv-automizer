@@ -1,0 +1,51 @@
+{
+  "name": "cv-automizer",
+  "version": "0.9.0",
+  "description": "Generador de CVs personalizados mediante IA",
+  "private": true,
+  "scripts": {
+    "start": "node src/index.js",
+    "tui": "node --experimental-ffi src/tui/index.js",
+    "desktop": "electron desktop/main.cjs"
+  },
+  "keywords": [
+    "cv",
+    "resume",
+    "ai",
+    "ollama",
+    "gemini",
+    "claude",
+    "groq",
+    "opencode",
+    "electron",
+    "opentui"
+  ],
+  "author": "jorgelol20",
+  "license": "0BSD",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jorgelol20/cv-automizer.git"
+  },
+  "homepage": "https://github.com/jorgelol20/cv-automizer#readme",
+  "bugs": {
+    "url": "https://github.com/jorgelol20/cv-automizer/issues"
+  },
+  "type": "module",
+  "engines": {
+    "node": ">=22.12"
+  },
+  "dependencies": {
+    "@google/genai": "^2.22.0",
+    "@opentui/core": "^0.9.9",
+    "ajv": "^8.20.0",
+    "dotenv": "^17.4.2",
+    "playwright": "^1.63.0"
+  },
+  "devDependencies": {
+    "electron": "^44.3.0"
+  },
+  "allowScripts": {
+    "electron": true,
+    "protobufjs": true
+  }
+}
